@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="api.development.platform.mapper.InterfaceInfoMapper">
+
+    <resultMap id="BaseResultMap" type="api.development.platform.model.entity.InterfaceInfo">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="interfaceName" column="interfaceName" jdbcType="VARCHAR"/>
+            <result property="interfaceDescript" column="interfaceDescript" jdbcType="VARCHAR"/>
+            <result property="interfaceUrl" column="interfaceUrl" jdbcType="VARCHAR"/>
+            <result property="requestHeader" column="requestHeader" jdbcType="VARCHAR"/>
+            <result property="responceHeader" column="responceHeader" jdbcType="VARCHAR"/>
+            <result property="interfaceType" column="interfaceType" jdbcType="VARCHAR"/>
+            <result property="interfaceStatus" column="interfaceStatus" jdbcType="TINYINT"/>
+            <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+            <result property="update_time" column="update_time" jdbcType="TIMESTAMP"/>
+            <result property="is_deleted" column="is_deleted" jdbcType="TINYINT"/>
+            <result property="userId" column="userId" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,interfaceName,interfaceDescript,
+        interfaceUrl,requestHeader,responceHeader,
+        interfaceType,interfaceStatus,createTime,
+        update_time,is_deleted,userId
+    </sql>
+</mapper>
