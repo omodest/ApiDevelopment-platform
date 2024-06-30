@@ -1,4 +1,4 @@
-import { addRule, removeRule, rule, updateRule } from '@/services/ant-design-pro/api';
+import { addRule, removeRule, updateRule } from '@/services/ant-design-pro/api';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
@@ -11,11 +11,13 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl } from '@umijs/max';
-import { Button, Drawer, Input, message } from 'antd';
+import { Button, Drawer, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
 import {listInterfaceInfoByPageUsingGet} from "@/services/apiform_backend/interfaceInfoController";
+import CreateModal from "@/pages/InterfaceInfo/components/CreateModal";
+
 
 /**
  * @en-US Add node
@@ -85,6 +87,12 @@ const handleRemove = async (selectedRows: API.RuleListItem[]) => {
 };
 
 const TableList: React.FC = () => {
+  /**
+   * @en-US Pop-up window of new window
+   * @zh-CN 新建窗口的弹窗
+   *  */
+  const [createModalVisible, handleModalVisible] = useState<boolean>(false);
+
   /**
    * @en-US Pop-up window of new window
    * @zh-CN 新建窗口的弹窗
@@ -208,8 +216,11 @@ const TableList: React.FC = () => {
 
   return (
     <PageContainer>
+      {/*查询表格*/}
       <ProTable<API.RuleListItem, API.PageParams>
         headerTitle={intl.formatMessage({
+          // 可以选中id后的字符串，ctrl + shift + f 查询枚举值
+          // 这里的id可以理解是一个枚举值，这里表示查询表格
           id: 'pages.searchTable.title',
           defaultMessage: 'Enquiry form',
         })}
@@ -223,9 +234,10 @@ const TableList: React.FC = () => {
             type="primary"
             key="primary"
             onClick={() => {
-              handleModalOpen(true);
+              handleModalVisible(true);
             }}
           >
+            {/*新建*/}
             <PlusOutlined/> <FormattedMessage id="pages.searchTable.new" defaultMessage="New"/>
           </Button>,
         ]}
@@ -276,41 +288,19 @@ const TableList: React.FC = () => {
           </Button>
         </FooterToolbar>
       )}
-      <ModalForm
-        title={intl.formatMessage({
-          id: 'pages.searchTable.createForm.newRule',
-          defaultMessage: 'New rule',
-        })}
-        width="400px"
-        open={createModalOpen}
-        onOpenChange={handleModalOpen}
-        onFinish={async (value) => {
-          const success = await handleAdd(value as API.RuleListItem);
-          if (success) {
-            handleModalOpen(false);
-            if (actionRef.current) {
-              actionRef.current.reload();
-            }
-          }
+      {/*新建规则*/}
+      <CreateModal
+        columns={columns}
+        onCancel={() => {
+          handleModalVisible(false);
         }}
-      >
-        <ProFormText
-          rules={[
-            {
-              required: true,
-              message: (
-                <FormattedMessage
-                  id="pages.searchTable.ruleName"
-                  defaultMessage="Rule name is required"
-                />
-              ),
-            },
-          ]}
-          width="md"
-          name="name"
-        />
-        <ProFormTextArea width="md" name="desc"/>
-      </ModalForm>
+        onSubmit={(values) => {
+          handleAdd(values);
+        }}
+        visible={createModalVisible}
+      />
+
+
       <UpdateForm
         onSubmit={async (value) => {
           const success = await handleUpdate(value);
@@ -318,7 +308,7 @@ const TableList: React.FC = () => {
             handleUpdateModalOpen(false);
             setCurrentRow(undefined);
             if (actionRef.current) {
-              actionRef.current.reload();
+              actionRef.current?.reload();
             }
           }
         }}

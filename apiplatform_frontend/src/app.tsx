@@ -6,6 +6,7 @@ import { history, Link } from '@umijs/max';
 import {requestConfig} from './requestConfig';
 import React from 'react';
 import {getLoginUserUsingGet} from "@/services/apiform_backend/userController";
+import defaultSettings from "../config/defaultSettings";
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
 
@@ -93,7 +94,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
             <SettingDrawer
               disableUrlParams
               enableDarkTheme
-              settings={initialState?.settings}
+              settings={defaultSettings}
               onSettingChange={(settings) => {
                 setInitialState((preInitialState) => ({
                   ...preInitialState,
@@ -105,7 +106,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
         </>
       );
     },
-    ...initialState?.settings,
+    ...defaultSettings,
   };
 };
 

@@ -16,44 +16,26 @@ export default [
     layout: false,
     routes: [
       {
-        name: 'login',
+        name: '登录',
         path: '/user/login',
         component: './User/Login',
       },
     ],
   },
   {
-    path: '/welcome',
-    name: 'welcome',
-    icon: 'smile',
-    component: './Welcome',
-  },
-  {
     path: '/admin',
-    name: 'admin',
+    name: '管理员页面',
     icon: 'crown',
+    // 这里可以去查看 ant design pro官网，了解权限为什么写成这样
     access: 'canAdmin',
     routes: [
       {
-        path: '/admin',
-        redirect: '/admin/sub-page',
-      },
-      {
-        path: '/admin/sub-page',
-        name: 'sub-page',
-        component: './Admin',
-      },
+        name: '接口管理',
+        icon: 'table',
+        path: '/admin/interface_info',
+        component: './InterfaceInfo'
+      }
     ],
-  },
-  {
-    name: 'list.table-list',
-    icon: 'table',
-    path: '/list',
-    component: './TableList',
-  },
-  {
-    path: '/',
-    redirect: '/welcome',
   },
   {
     path: '*',
