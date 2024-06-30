@@ -119,7 +119,8 @@ const Login: React.FC = () => {
     try {
       // 登录
       const res = await userLoginUsingPost({ ...values});
-      if (res.status === 'ok') {
+      // console.log(res)
+      if (res.data) {
         const urlParams = new URL(window.location.href).searchParams;
         setTimeout(() => {
           history.push(urlParams.get('redirect') || '/');
