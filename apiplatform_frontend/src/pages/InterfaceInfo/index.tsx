@@ -2,24 +2,20 @@ import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
   FooterToolbar,
-  ModalForm,
   PageContainer,
   ProDescriptions,
-  ProFormText,
-  ProFormTextArea,
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl } from '@umijs/max';
 import { Button, Drawer, message } from 'antd';
 import React, { useRef, useState } from 'react';
-import type { FormValueType } from './components/UpdateForm';
-import UpdateForm from './components/UpdateForm';
 import {
-  addInterfaceInfoUsingPost,
+  addInterfaceInfoUsingPost, deleteInterfaceInfoUsingPost,
   listInterfaceInfoByPageUsingGet,
   updateInterfaceInfoUsingPost
 } from "@/services/apiform_backend/interfaceInfoController";
 import CreateModal from "@/pages/InterfaceInfo/components/CreateModal";
+import UpdateModal from "@/pages/InterfaceInfo/components/UpdateModal";
 
 
 
@@ -35,13 +31,7 @@ const TableList: React.FC = () => {
    * @en-US Pop-up window of new window
    * @zh-CN 新建窗口的弹窗
    *  */
-  const [createModalOpen, handleModalOpen] = useState<boolean>(false);
-  /**
-   * @en-US The pop-up window of the distribution update window
-   * @zh-CN 分布更新窗口的弹窗
-   * */
-  const [updateModalOpen, handleUpdateModalOpen] = useState<boolean>(false);
-
+  const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
@@ -152,7 +142,7 @@ const TableList: React.FC = () => {
     const hide = message.loading('正在删除');
     if (!record) return true;
     try {
-      await deleteInterfaceInfoUsingPOST({
+      await deleteInterfaceInfoUsingPost({
         id: record.id
       });
       hide();
@@ -358,11 +348,12 @@ const TableList: React.FC = () => {
       />
 
 
-      <UpdateForm
+      <UpdateModal
+        columns={columns}
         onSubmit={async (value) => {
           const success = await handleUpdate(value);
           if (success) {
-            handleUpdateModalOpen(false);
+            handleUpdateModalVisible(false);
             setCurrentRow(undefined);
             if (actionRef.current) {
               actionRef.current?.reload();
@@ -370,14 +361,15 @@ const TableList: React.FC = () => {
           }
         }}
         onCancel={() => {
-          handleUpdateModalOpen(false);
+          handleUpdateModalVisible(false);
           if (!showDetail) {
             setCurrentRow(undefined);
           }
         }}
-        updateModalOpen={updateModalOpen}
+        visible={updateModalVisible}
         values={currentRow || {}}
       />
+
 
       <Drawer
         width={600}

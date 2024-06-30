@@ -112,7 +112,7 @@ public class InterfaceInfoController {
         InterfaceInfo oldInterfaceInfo = interfaceInfoService.getById(id);
         ThrowUtils.throwIf(oldInterfaceInfo == null, ErrorCode.NOT_FOUND_ERROR);
         // 仅限管理员或创建者才能删除
-        if (!oldInterfaceInfo.getUserId().equals(user.getId())|| userService.isAdmin(httpServletRequest) ){
+        if (!oldInterfaceInfo.getUserId().equals(user.getId()) && !userService.isAdmin(httpServletRequest) ){
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR,"仅限管理员或创建者才能删除");
         }
         boolean result = interfaceInfoService.updateById(interfaceInfo);
