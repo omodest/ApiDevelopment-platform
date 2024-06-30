@@ -54,13 +54,13 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
         userLogoutUsingPost();
         const { search, pathname} = window.location;
         const redirect = pathname + search;
-        history.replace('/user/login',{redirect})
-        return;
-      }
-      history.push(`/account/${key}`);
-    },
-    [setInitialState],
-  );
+          history.replace('/user/login',{redirect})
+          return;
+        }
+        history.push(`/account/${key}`);
+      },
+      [setInitialState],
+    );
 
   const loading = (
     <span className={styles.action}>
