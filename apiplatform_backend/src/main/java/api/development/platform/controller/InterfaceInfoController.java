@@ -56,8 +56,8 @@ public class InterfaceInfoController {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         InterfaceInfo interfaceInfo = new InterfaceInfo();
-        BeanUtils.copyProperties(interfaceInfo, interfaceInfoAddRequest); // 将 第二个javabean中的属性复制到第一个javabean
-        interfaceInfoService.validInterfaceInfo(interfaceInfo, true);
+        BeanUtils.copyProperties(interfaceInfoAddRequest, interfaceInfo); // 将 第一个javabean中的属性复制到第二个javabean
+        interfaceInfoService.validInterfaceInfo(interfaceInfo, false);
         User loginUser = userService.getLoginUser(request);
         interfaceInfo.setUserId(loginUser.getId()); // 设置用户id
         boolean result = interfaceInfoService.save(interfaceInfo);
@@ -105,7 +105,7 @@ public class InterfaceInfoController {
         InterfaceInfo interfaceInfo = new InterfaceInfo();
         BeanUtils.copyProperties(interfaceInfoUpdateRequest, interfaceInfo); //
         // 参数校验
-        interfaceInfoService.validInterfaceInfo(interfaceInfo, false);
+        interfaceInfoService.validInterfaceInfo(interfaceInfo, true);
         long id = interfaceInfoUpdateRequest.getId();
         User user = userService.getLoginUser(httpServletRequest);
         // 判断是否存在

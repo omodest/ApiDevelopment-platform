@@ -79,8 +79,8 @@ export async function listInterfaceInfoVoByPageUsingPost(
 
 /** updateInterfaceInfo POST /api/interfaceinfo/update */
 export async function updateInterfaceInfoUsingPost(
-  body: API.InterfaceInfoUpdateRequest,
-  options?: { [key: string]: any },
+  body: { interfaceType?: string; update_time?: string; is_deleted?: number; interfaceUrl?: string; createTime?: string; interfaceDescript?: string; requestHeader?: string; responceHeader?: string; id: any | number; interfaceName?: string; userId?: number; interfaceStatus?: number },
+  options?: { [p: string]: any },
 ) {
   return request<API.BaseResponseBoolean_>('/api/interfaceinfo/update', {
     method: 'POST',

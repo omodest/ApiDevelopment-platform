@@ -8,6 +8,7 @@ import api.development.platform.model.entity.InterfaceInfo;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import api.development.platform.service.InterfaceInfoService;
 import api.development.platform.mapper.InterfaceInfoMapper;
+import net.bytebuddy.implementation.bytecode.Throw;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -29,10 +30,12 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
 
         // 创建时，参数不能为空
         if (add) {
-            ThrowUtils.throwIf(StringUtils.isAnyBlank(interfaceName), ErrorCode.PARAMS_ERROR);
+            if (StringUtils.isAnyBlank(interfaceName)){
+                throw  new BusinessException(ErrorCode.PARAMS_ERROR);
+            }
         }
         // 有参数则校验
-        if (StringUtils.isNotBlank(interfaceName) && interfaceName.length() > 80) {
+        if (StringUtils.isNotBlank(interfaceName) && interfaceName.length()    > 80) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "标题过长");
         }
     }
