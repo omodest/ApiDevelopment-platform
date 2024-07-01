@@ -18,8 +18,8 @@
     </properties>
     <dependencies>
         <dependency>
-            <groupId>com.yupi</groupId>
-            <artifactId>yuapi-client-sdk</artifactId>
+            <groupId>api.development</groupId>
+            <artifactId>apiplatform_client_sdk</artifactId>
             <version>0.0.1</version>
         </dependency>
         <dependency>
@@ -45,6 +45,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

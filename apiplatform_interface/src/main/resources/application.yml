@@ -2,4 +2,7 @@ server:
   port: 8123
   servlet:
     context-path: /api
-
+name:
+  client:
+    access-key: poise.admin
+    secret-key: admin.admin

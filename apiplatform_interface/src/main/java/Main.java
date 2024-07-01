@@ -1,15 +1,27 @@
-import api.development.apiplatform_interface.client.NameClient;
-import api.development.apiplatform_interface.model.User;
+import api.development.apiplatform_client_sdk.client.NameClient;
+import api.development.apiplatform_client_sdk.model.User;
+
+import javax.annotation.Resource;
 
 public class Main {
+    @Resource
+    public static NameClient nameClient;
+
     public static void main(String[] args) {
-        String accessKey = "poise.admin";
-        String secretKey = "admin.admin";
-        NameClient nc = new NameClient(accessKey,secretKey);
-        String name1 = nc.getNameByGet("GETPoise");
-        String name2 = nc.getNameByPost("POSTPoise");
+
+        String name1 = nameClient.getNameByGet("GETPoise");
+        String name2 = nameClient.getNameByPost("POSTPoise");
         User user = new User();
         user.setName("POSTJson");
-        String name3 = nc.getUserNameByPost(user);
+        String name3 = nameClient.getUserNameByPost(user);
+
+//        String accessKey = "poise.admin";
+//        String secretKey = "admin.admin";
+//        NameClient nc = new NameClient(accessKey,secretKey);
+//        String name1 = nc.getNameByGet("GETPoise");
+//        String name2 = nc.getNameByPost("POSTPoise");
+//        User user = new User();
+//        user.setName("POSTJson");
+//        String name3 = nc.getUserNameByPost(user);
     }
 }

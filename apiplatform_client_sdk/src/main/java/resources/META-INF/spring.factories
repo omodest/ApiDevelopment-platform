@@ -1,0 +1,2 @@
+# spring boot starter
+org.springframework.boot.autoconfigure.EnableAutoConfiguration = api.development.apiplatform_client_sdk.NameClientConfig
