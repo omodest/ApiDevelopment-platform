@@ -15,6 +15,16 @@ import java.util.HashMap;
  */
 public class NameClient {
 
+    public NameClient(String accessKey, String secretKey) {
+        this.accessKey = accessKey;
+        this.secretKey = secretKey;
+    }
+
+    private String accessKey;
+
+    private String secretKey;
+
+
     // 使用get方法从服务器获取客户信息
     public String getNameByGet(String name){
         HashMap<String, Object> hashMap = new HashMap<>();
