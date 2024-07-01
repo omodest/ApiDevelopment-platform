@@ -17,7 +17,10 @@
 package api.development.apiplatform_interface.controller;
 
 import api.development.apiplatform_interface.model.User;
+import api.development.apiplatform_interface.utils.SignUtils;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -35,9 +38,39 @@ public class NameController {
     public String getNameByPost(@RequestParam String name) {
         return "Post name Hello：" + name;
     }
-    @PostMapping("/JSON")
-    public String getUserNameByPost(@RequestBody User user) {
+    @PostMapping("/user")
+    public String getUserNameByPost(@RequestBody User user, HttpServletRequest httpServletRequest) {
+        // 这五个可以一步一步去做校验,比如 accesskey 我们先去数据库中查一下
+        String accessKey = httpServletRequest.getHeader("accessKey");
+//        String secretKey = httpServletRequest.getHeader("secretKey");
+        String body = httpServletRequest.getHeader("body");
+        String nonce = httpServletRequest.getHeader("nonce");
+        String timestamp = httpServletRequest.getHeader("timestamp");
+        String sign = httpServletRequest.getHeader("sign");
+
+        // todo 这里写死，后续可以完善，根据用户信息去查数据库
+        if (!accessKey.equals("poise.admin")){
+            throw new RuntimeException("无权限");
+        }
+
+        // todo 后续可根据自己的想法去完善
+        // 后端存储用hashmap或redis都可以
+        // 校验随机数,模拟一下,直接判断nonce是否大于10000
+        if(Long.parseLong(nonce)>10000){
+            throw new RuntimeException("无权限");
+        }
+
+        // todo 时间戳校验，时间和当前时间差不能少于五分钟
+
+        // todo 签名校验，sercrtKey是从库中查询出来的
+        String signCheck = SignUtils.getSignUtils(body, "admin.admin");
+        if (!sign.equals(signCheck)){
+            throw new RuntimeException("无权限");
+        }
+
+
         return "Post username Hello " + user.getName();
+
     }
 
 

@@ -1,6 +1,7 @@
 package api.development.apiplatform_interface.client;
 
 import api.development.apiplatform_interface.model.User;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
@@ -9,6 +10,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+
+import static api.development.apiplatform_interface.utils.SignUtils.getSignUtils;
 
 /**
  * 调用第三方接口的客户端
@@ -37,9 +42,9 @@ public class NameClient {
     }
     // 使用POST方法从服务器获取名称信息
     public String getNameByPost(@RequestParam String name){
-        HashMap<Object, Object> hashMap = new HashMap<>();
+        HashMap<String, Object> hashMap = new HashMap<>(); // 虽然可以使用object转string，但这里的键不使用object
         hashMap.put("name",name);
-        String result = HttpUtil.post("http://localhost:8123/api/name/", String.valueOf(hashMap));
+        String result = HttpUtil.post("http://localhost:8123/api/name/", hashMap);
         System.out.println(result);
         return result;
     }
@@ -47,13 +52,31 @@ public class NameClient {
     public String getUserNameByPost(@RequestBody User user){
         String jsonStr = JSONUtil.toJsonStr(user);
         // 使用HttpRequest工具发起POST请求，并获取服务器的响应
-        HttpResponse httpResponse = HttpRequest.post("http://localhost:8123/api/name/")
+        HttpResponse httpResponse = HttpRequest.post("http://localhost:8123/api/name/user")
                 .body(jsonStr)
+                .addHeaders(getHeader(jsonStr)) // 设置操作
                 .execute();
-        //
         System.out.println("post username:" + httpResponse.getStatus());
         String body = httpResponse.body();
         System.out.println(body);
         return body;
     }
+
+    /**
+     * 设置请求头
+     * @return
+     */
+    private Map<String, String> getHeader(String body){
+        Map<String, String> hashMap = new HashMap<>();
+        hashMap.put("accessKey",accessKey); // 标识
+//        hashMap.put("secretKey",secretKey); // 密钥
+        hashMap.put("sign", getSignUtils(body,secretKey)); // 签名
+
+        hashMap.put("body", body); // 请求体内容
+        hashMap.put("nonce", RandomUtil.randomNumbers(4)); // 4为随机数字字符串
+        hashMap.put("timestamp", String.valueOf(System.currentTimeMillis() / 1000)); // 时间戳
+
+        return hashMap;
+    }
+
 }
