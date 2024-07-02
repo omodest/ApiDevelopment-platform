@@ -138,6 +138,7 @@ declare namespace API {
     interfaceUrl?: string;
     is_deleted?: number;
     requestHeader?: string;
+    requestParams?: string;
     responceHeader?: string;
     update_time?: string;
     userId?: number;

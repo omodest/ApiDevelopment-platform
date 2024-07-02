@@ -45,6 +45,11 @@ public class InterfaceInfo implements Serializable {
     private String responceHeader;
 
     /**
+     * 请求参数
+     */
+    private String requestParams;
+
+    /**
      * 请求类型
      */
     private String interfaceType;

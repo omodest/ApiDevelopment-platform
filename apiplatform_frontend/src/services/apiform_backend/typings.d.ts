@@ -130,6 +130,7 @@ declare namespace API {
     interfaceDescript?: string;
     interfaceName?: string;
     interfaceStatus?: number;
+    requestParams?: string;
     interfaceType?: string;
     interfaceUrl?: string;
     is_deleted?: number;
