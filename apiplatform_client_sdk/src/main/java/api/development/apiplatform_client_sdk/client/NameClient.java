@@ -7,7 +7,6 @@ import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
-import org.springframework.stereotype.Component;
 
 
 import java.util.HashMap;

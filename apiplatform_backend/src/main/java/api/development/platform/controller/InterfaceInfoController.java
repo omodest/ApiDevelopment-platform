@@ -1,10 +1,8 @@
 package api.development.platform.controller;
 
+import api.development.apiplatform_client_sdk.client.NameClient;
 import api.development.platform.annotation.AuthCheck;
-import api.development.platform.common.BaseResponse;
-import api.development.platform.common.DeleteRequest;
-import api.development.platform.common.ErrorCode;
-import api.development.platform.common.ResultUtils;
+import api.development.platform.common.*;
 import api.development.platform.constant.CommonConstant;
 import api.development.platform.constant.UserConstant;
 import api.development.platform.exception.BusinessException;
@@ -14,6 +12,7 @@ import api.development.platform.model.dto.InterfaceInfo.InterfaceInfoQueryReques
 import api.development.platform.model.dto.InterfaceInfo.InterfaceInfoUpdateRequest;
 import api.development.platform.model.entity.InterfaceInfo;
 import api.development.platform.model.entity.User;
+import api.development.platform.model.enums.InterfaceStatusEnum;
 import api.development.platform.service.InterfaceInfoService;
 import api.development.platform.service.UserService;
 import cn.hutool.json.JSONUtil;
@@ -41,6 +40,9 @@ public class InterfaceInfoController {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private NameClient nameClient;
 
     // region 增删改查
 
@@ -118,6 +120,70 @@ public class InterfaceInfoController {
         boolean result = interfaceInfoService.updateById(interfaceInfo);
         return ResultUtils.success(result);
     }
+
+    /**
+     * 接口发布
+     * @param idRequest
+     * @param httpServletRequest
+     * @return
+     */
+    @PostMapping("/online")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE) // aop 自定义注解，检验是否是管理员
+    public BaseResponse<Boolean> onlineInterfaceInfo(@RequestBody IdRequest idRequest, HttpServletRequest httpServletRequest){
+        // 参数校验
+        long id = idRequest.getId();
+        if (id <= 0 || idRequest == null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        // 查询数据
+        InterfaceInfo interfaceInfoServiceById = interfaceInfoService.getById(id);
+        if (interfaceInfoServiceById == null){
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+        // 使用interface项目中的方法，验证接口是否能访问同
+        // todo 目前这里仅是使用了测试接口，后续将接口改成数据库中相应数据
+        api.development.apiplatform_client_sdk.model.User user = new api.development.apiplatform_client_sdk.model.User();
+        user.setName("跑通上线接口上线流程");
+        String userNameByPost = nameClient.getUserNameByPost(user);
+        if (StringUtils.isAnyBlank(userNameByPost)){
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "接口验证错误");
+        }
+        // 修改状态为上线
+        InterfaceInfo interfaceInfo = new InterfaceInfo();
+        interfaceInfo.setId(id);
+        interfaceInfo.setInterfaceStatus(InterfaceStatusEnum.ONLINE.getValue());
+        boolean updateById = interfaceInfoService.updateById(interfaceInfo);
+        return ResultUtils.success(updateById);
+    }
+
+    /**
+     * 下线发布
+     * @param idRequest
+     * @param httpServletRequest
+     * @return
+     */
+    @PostMapping("/offline")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE) // aop 自定义注解，检验是否是管理员
+    public BaseResponse<Boolean> offlineInterfaceInfo(@RequestBody IdRequest idRequest, HttpServletRequest httpServletRequest){
+        // 参数校验
+        long id = idRequest.getId();
+        if (id <= 0 || idRequest == null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        // 查询数据
+        InterfaceInfo interfaceInfoServiceById = interfaceInfoService.getById(id);
+        if (interfaceInfoServiceById == null){
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+
+        // 修改状态为上线
+        InterfaceInfo interfaceInfo = new InterfaceInfo();
+        interfaceInfo.setId(id);
+        interfaceInfo.setInterfaceStatus(InterfaceStatusEnum.OFFLINE.getValue());
+        boolean updateById = interfaceInfoService.updateById(interfaceInfo);
+        return ResultUtils.success(updateById);
+    }
+
 
     /**
      * 根据 id 获取
