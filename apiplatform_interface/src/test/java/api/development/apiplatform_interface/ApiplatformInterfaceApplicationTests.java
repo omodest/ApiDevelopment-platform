@@ -3,7 +3,6 @@ package api.development.apiplatform_interface;
 import api.development.apiplatform_client_sdk.client.NameClient;
 import api.development.apiplatform_client_sdk.model.User;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;

@@ -14,8 +14,12 @@ import {
   listInterfaceInfoByPageUsingGet,
   updateInterfaceInfoUsingPost
 } from "@/services/apiform_backend/interfaceInfoController";
-import CreateModal from "@/pages/InterfaceInfo/components/CreateModal";
-import UpdateModal from "@/pages/InterfaceInfo/components/UpdateModal";
+import CreateModal from "@/pages/Admin/InterfaceInfo/components/CreateModal";
+import UpdateModal from "@/pages/Admin/InterfaceInfo/components/UpdateModal";
+import {
+  offlineInterfaceInfoUsingPost,
+  onlineInterfaceInfoUsingPost
+} from "@/services/apiplateform-backend/interfaceInfoController";
 
 
 
@@ -91,46 +95,46 @@ const TableList: React.FC = () => {
    *
    * @param record
    */
-  // const handleOnline = async (record: API.IdRequest) => {
-  //   const hide = message.loading('发布中');
-  //   if (!record) return true;
-  //   try {
-  //     await onlineInterfaceInfoUsingPOST({
-  //       id: record.id
-  //     });
-  //     hide();
-  //     message.success('操作成功');
-  //     actionRef.current?.reload();
-  //     return true;
-  //   } catch (error: any) {
-  //     hide();
-  //     message.error('操作失败，' + error.message);
-  //     return false;
-  //   }
-  // };
+  const handleOnline = async (record: API.IdRequest) => {
+    const hide = message.loading('发布中');
+    if (!record) return true;
+    try {
+      await onlineInterfaceInfoUsingPost({
+        id: record.id
+      });
+      hide();
+      message.success('操作成功');
+      actionRef.current?.reload();
+      return true;
+    } catch (error: any) {
+      hide();
+      message.error('操作失败，' + error.message);
+      return false;
+    }
+  };
 
   /**
    * 下线接口
    *
    * @param record
    */
-  // const handleOffline = async (record: API.IdRequest) => {
-  //   const hide = message.loading('发布中');
-  //   if (!record) return true;
-  //   try {
-  //     await offlineInterfaceInfoUsingPOST({
-  //       id: record.id
-  //     });
-  //     hide();
-  //     message.success('操作成功');
-  //     actionRef.current?.reload();
-  //     return true;
-  //   } catch (error: any) {
-  //     hide();
-  //     message.error('操作失败，' + error.message);
-  //     return false;
-  //   }
-  // };
+  const handleOffline = async (record: API.IdRequest) => {
+    const hide = message.loading('发布中');
+    if (!record) return true;
+    try {
+      await offlineInterfaceInfoUsingPost({
+        id: record.id
+      });
+      hide();
+      message.success('操作成功');
+      actionRef.current?.reload();
+      return true;
+    } catch (error: any) {
+      hide();
+      message.error('操作失败，' + error.message);
+      return false;
+    }
+  };
 
   /**
    *  Delete node
@@ -196,7 +200,7 @@ const TableList: React.FC = () => {
     },
     {
       title: '响应头',
-      dataIndex: 'responseHeader',
+      dataIndex: 'responceHeader',
       valueType: 'jsonCode',
     },
     {
@@ -220,7 +224,7 @@ const TableList: React.FC = () => {
       valueType: 'option',
       render: (_, record) => [
         <a
-          key="config"
+          key={`update-${record.id}`}  // 修改key的方式，确保唯一性
           onClick={() => {
             handleUpdateModalVisible(true);
             setCurrentRow(record);
@@ -228,35 +232,41 @@ const TableList: React.FC = () => {
         >
           修改
         </a>,
-        record.status === 0 ? <a
-          key="config"
-          onClick={() => {
-            handleOnline(record);
+
+        record.interfaceStatus === 0 ? <a
+          key={`publish-${record.id}`}  // 修改key的方式，确保唯一性
+          onClick={async () => {
+            await handleOnline(record);
           }}
         >
           发布
         </a> : null,
-        record.status === 1 ? <Button
+
+        record.interfaceStatus === 1 ? <Button
           type="text"
-          key="config"
+          key={`offline-${record.id}`}  // 修改key的方式，确保唯一性
           danger
-          onClick={() => {
-            handleOffline(record);
+          onClick={async () => {
+            await handleOffline(record);
           }}
         >
           下线
         </Button> : null,
+
         <Button
           type="text"
-          key="config"
+          key={`delete-${record.id}`}  // 修改key的方式，确保唯一性
           danger
           onClick={() => {
-            handleRemove(record);
+            handleRemove(record).then(() => {
+              actionRef.current?.reload();
+            });
           }}
         >
           删除
         </Button>,
       ],
+
     },
   ];
 

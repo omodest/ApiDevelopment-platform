@@ -143,9 +143,9 @@ public class InterfaceInfoController {
         // 使用interface项目中的方法，验证接口是否能访问同
         // todo 目前这里仅是使用了测试接口，后续将接口改成数据库中相应数据
         api.development.apiplatform_client_sdk.model.User user = new api.development.apiplatform_client_sdk.model.User();
-        user.setName("跑通上线接口上线流程");
+        user.setName("roqweqeot1"); // 这里不能出现中文，会乱码，导致在自定义sdk中不匹配，出现无权限错误
         String userNameByPost = nameClient.getUserNameByPost(user);
-        if (StringUtils.isAnyBlank(userNameByPost)){
+        if (StringUtils.isAnyBlank(userNameByPost) || StringUtils.contains(userNameByPost,"无权限")){
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "接口验证错误");
         }
         // 修改状态为上线
@@ -157,7 +157,7 @@ public class InterfaceInfoController {
     }
 
     /**
-     * 下线发布
+     * 下线
      * @param idRequest
      * @param httpServletRequest
      * @return
