@@ -8,6 +8,7 @@ import api.development.platform.constant.UserConstant;
 import api.development.platform.exception.BusinessException;
 import api.development.platform.exception.ThrowUtils;
 import api.development.platform.model.dto.InterfaceInfo.InterfaceInfoAddRequest;
+import api.development.platform.model.dto.InterfaceInfo.InterfaceInfoInvokeRequest;
 import api.development.platform.model.dto.InterfaceInfo.InterfaceInfoQueryRequest;
 import api.development.platform.model.dto.InterfaceInfo.InterfaceInfoUpdateRequest;
 import api.development.platform.model.entity.InterfaceInfo;
@@ -18,6 +19,7 @@ import api.development.platform.service.UserService;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -154,6 +156,39 @@ public class InterfaceInfoController {
         interfaceInfo.setInterfaceStatus(InterfaceStatusEnum.ONLINE.getValue());
         boolean updateById = interfaceInfoService.updateById(interfaceInfo);
         return ResultUtils.success(updateById);
+    }
+    /**
+     * 接口 在线调用
+     * @param interfaceInfoInvokeRequest
+     * @param httpServletRequest
+     * @return
+     */
+    @PostMapping("/invoke")
+    public BaseResponse<Object> invokeInterfaceInfo(@RequestBody InterfaceInfoInvokeRequest interfaceInfoInvokeRequest, HttpServletRequest httpServletRequest){
+        Long id = interfaceInfoInvokeRequest.getId();
+        String requestParams = interfaceInfoInvokeRequest.getRequestParams();
+        // 参数校验
+        if (interfaceInfoInvokeRequest == null || id <= 0){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        // 查询数据是否存在
+        InterfaceInfo oldInterfaceInfo  = interfaceInfoService.getById(id);
+        if (oldInterfaceInfo  == null){
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+        if (oldInterfaceInfo.getInterfaceStatus().equals(InterfaceStatusEnum.OFFLINE)){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"接口已关闭");
+        }
+        // 查询调用接口的用户
+        User loginUser = userService.getLoginUser(httpServletRequest);
+        String accessKey = loginUser.getAccessKey();
+        String secretKey = loginUser.getSecretKey();
+        // todo 待后续修改为真实接口
+        NameClient nc = new NameClient(accessKey, secretKey);
+        Gson gson = new Gson();
+        api.development.apiplatform_client_sdk.model.User user1 = gson.fromJson(requestParams, api.development.apiplatform_client_sdk.model.User.class);
+        String userNameByPost = nc.getUserNameByPost(user1);
+        return ResultUtils.success(userNameByPost);
     }
 
     /**

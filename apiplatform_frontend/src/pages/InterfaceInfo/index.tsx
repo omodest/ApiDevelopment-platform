@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import {Button, Card, Descriptions, Form, message, Input, Spin, Divider} from 'antd';
 import { useParams } from '@@/exports';
 import {getInterfaceInfoVoByIdUsingGet} from "@/services/apiform_backend/interfaceInfoController";
+import {invokeInterfaceInfoUsingPost} from "../../services/apiplateform-backend/interfaceInfoController";
 
 /**
  * 主页
@@ -32,7 +33,7 @@ const Index: React.FC = () => {
     }
     setLoading(false);
   };
-
+  // 重新加载数据
   useEffect(() => {
     loadData();
   }, []);
@@ -42,17 +43,20 @@ const Index: React.FC = () => {
       message.error('接口不存在');
       return;
     }
+    // 在开始调用接口之前，将 invokeLoading 设首为 true，表示正在加载中
     setInvokeLoading(true);
     try {
-      const res = await invokeInterfaceInfoUsingPOST({
+      const res = await invokeInterfaceInfoUsingPost({
         id: params.id,
         ...values,
       });
+      // 将接口调用的结果(res.data)更新到 invokeRes 状态变量中
       setInvokeRes(res.data);
       message.success('请求成功');
     } catch (error: any) {
       message.error('操作失败，' + error.message);
     }
+    // 无论成功或失败，最后将 invokeLoading 设置为 false，表示加载完成
     setInvokeLoading(false);
   };
 console.log(data)
@@ -78,7 +82,8 @@ console.log(data)
       <Divider />
       <Card title="在线测试">
         <Form name="invoke" layout="vertical" onFinish={onFinish}>
-          <Form.Item label="请求参数" name="userRequestParams">
+          {/*这里的name要与后端的字段映射*/}
+          <Form.Item label="请求参数" name="requestParams">
             <Input.TextArea />
           </Form.Item>
           <Form.Item wrapperCol={{ span: 16 }}>

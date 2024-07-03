@@ -6,6 +6,7 @@ import {
   ProDescriptions,
   ProTable,
 } from '@ant-design/pro-components';
+import {Tooltip} from "antd";
 import { FormattedMessage, useIntl } from '@umijs/max';
 import { Button, Drawer, message } from 'antd';
 import React, { useRef, useState } from 'react';
@@ -41,7 +42,14 @@ const TableList: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<API.RuleListItem>();
   const [selectedRowsState, setSelectedRows] = useState<API.RuleListItem[]>([]);
-
+  // 格式化 JSON 数据的 React 组件
+    const JsonTooltip = ({ json }) => {
+      return (
+        <div>
+          <pre>{JSON.stringify(json, null, 2)}</pre>
+        </div>
+      );
+    };
   /**
    * @en-US Add node
    * @zh-CN 添加节点
@@ -192,16 +200,49 @@ const TableList: React.FC = () => {
       title: 'url',
       dataIndex: 'interfaceUrl',
       valueType: 'text',
+      render: (_, record) => (
+        <Tooltip title={<JsonTooltip json={record.interfaceUrl} />}>
+          <div style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {JSON.stringify(record.interfaceUrl)}
+          </div>
+        </Tooltip>
+      ),
     },
     {
       title: '请求头',
       dataIndex: 'requestHeader',
       valueType: 'jsonCode',
+      render: (_, record) => (
+        <Tooltip title={<JsonTooltip json={record.requestHeader} />}>
+          <div style={{ maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {JSON.stringify(record.requestHeader)}
+          </div>
+        </Tooltip>
+      ),
+    },
+    {
+      title: '请求参数',
+      dataIndex: 'requestParams',
+      valueType: 'jsonCode',
+      render: (_, record) => (
+        <Tooltip title={JSON.stringify(record.requestHeader)}>
+          <div style={{ maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {JSON.stringify(record.requestHeader)}
+          </div>
+        </Tooltip>
+      ),
     },
     {
       title: '响应头',
       dataIndex: 'responceHeader',
       valueType: 'jsonCode',
+      render: (_, record) => (
+        <Tooltip title={JSON.stringify(record.requestHeader)}>
+          <div style={{ maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {JSON.stringify(record.requestHeader)}
+          </div>
+        </Tooltip>
+      ),
     },
     {
       title: '状态',

@@ -36,6 +36,7 @@ public class InterfaceInfo implements Serializable {
 
     /**
      * 请求头
+     * {"Content-Type": "application/json"}
      */
     private String requestHeader;
 
@@ -46,11 +47,18 @@ public class InterfaceInfo implements Serializable {
 
     /**
      * 请求参数
+     * [
+     *  {
+     *      "name": "userName",
+     *      "type": "String"
+     *  }
+     * ]
      */
     private String requestParams;
 
     /**
      * 请求类型
+     *
      */
     private String interfaceType;
 

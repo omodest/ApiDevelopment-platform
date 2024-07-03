@@ -10,6 +10,7 @@
             <result property="interfaceDescript" column="interfaceDescript" jdbcType="VARCHAR"/>
             <result property="interfaceUrl" column="interfaceUrl" jdbcType="VARCHAR"/>
             <result property="requestHeader" column="requestHeader" jdbcType="VARCHAR"/>
+            <result property="requestParams" column="requestParams" jdbcType="VARCHAR"/>
             <result property="responceHeader" column="responceHeader" jdbcType="VARCHAR"/>
             <result property="interfaceType" column="interfaceType" jdbcType="VARCHAR"/>
             <result property="interfaceStatus" column="interfaceStatus" jdbcType="TINYINT"/>
@@ -21,7 +22,7 @@
 
     <sql id="Base_Column_List">
         id,interfaceName,interfaceDescript,
-        interfaceUrl,requestHeader,responceHeader,
+        interfaceUrl,requestHeader,requestParams,responceHeader,
         interfaceType,interfaceStatus,createTime,
         update_time,is_deleted,userId
     </sql>

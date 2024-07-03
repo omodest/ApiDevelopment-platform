@@ -21,7 +21,8 @@ export default [
     path: '/interface_info/:id',
     name: '查看接口',
     icon: 'smile',
-    component: './InterfaceInfo'
+    component: './InterfaceInfo',
+    hideInMenu: true
   },
   {
     path: '/user',
