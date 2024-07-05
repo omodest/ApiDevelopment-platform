@@ -61,7 +61,7 @@ public class InterfaceInfoController {
         }
         InterfaceInfo interfaceInfo = new InterfaceInfo();
         BeanUtils.copyProperties(interfaceInfoAddRequest, interfaceInfo); // 将 第一个javabean中的属性复制到第二个javabean
-        interfaceInfoService.validInterfaceInfo(interfaceInfo, false);
+        interfaceInfoService.validInterfaceInfo(interfaceInfo, true);
         User loginUser = userService.getLoginUser(request);
         interfaceInfo.setUserId(loginUser.getId()); // 设置用户id
         boolean result = interfaceInfoService.save(interfaceInfo);

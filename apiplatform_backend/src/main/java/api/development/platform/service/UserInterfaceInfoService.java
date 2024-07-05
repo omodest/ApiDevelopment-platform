@@ -1,6 +1,7 @@
-package generator.service;
+package api.development.platform.service;
 
-import generator.domain.UserInterfaceInfo;
+import api.development.platform.model.entity.InterfaceInfo;
+import api.development.platform.model.entity.UserInterfaceInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -9,5 +10,19 @@ import com.baomidou.mybatisplus.extension.service.IService;
 * @createDate 2024-07-03 17:43:09
 */
 public interface UserInterfaceInfoService extends IService<UserInterfaceInfo> {
+    /**
+     * 校验
+     *
+     * @param userInterfaceInfo
+     * @param add 需要调用时传的所有参数都为空
+     */
+    void validUserInterfaceInfo(UserInterfaceInfo userInterfaceInfo, boolean add);
 
+    /**
+     * 接口调用次数加 1 (数据库中有以 interfaceId 和 userId为联合主键的数据时，才调用这个函数，否则执行userInterfaceInfo add函数就行)
+     * @param interfaceId
+     * @param userId
+     * @return
+     */
+    boolean invokeCount(long interfaceId,long userId);
 }

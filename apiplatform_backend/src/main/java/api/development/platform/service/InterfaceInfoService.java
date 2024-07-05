@@ -3,6 +3,7 @@ package api.development.platform.service;
 
 import api.development.platform.model.entity.InterfaceInfo;
 import api.development.platform.model.entity.Post;
+import api.development.platform.model.entity.UserInterfaceInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**

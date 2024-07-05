@@ -1,54 +1,34 @@
-package api.development.platform.model.dto.InterfaceInfo;
+package api.development.platform.model.dto.userInterfaceInfo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
 
 /**
  * 创建请求
  */
 @Data
-public class InterfaceInfoAddRequest implements Serializable {
+public class UserInterfaceInfoAddRequest implements Serializable {
 
     /**
-     * 接口名称
+     * 调用用户 id
      */
-    private String interfaceName;
+    private Long userId;
 
     /**
-     * 接口描述
+     * 接口 id
      */
-    private String interfaceDescript;
+    private Long interfaceInfoId;
 
     /**
-     * 接口地址
+     * 总调用次数
      */
-    private String interfaceUrl;
+    private Integer totalNum;
 
     /**
-     * 请求头
+     * 剩余调用次数
      */
-    private String requestHeader;
+    private Integer leftNum;
 
-    /**
-     * 响应头
-     */
-    private String responceHeader;
-
-    /**
-     * 请求类型
-     */
-    private String interfaceType;
-
-
-    /**
-     * 请求参数
-     */
-    private String requestParams;
 
 }
