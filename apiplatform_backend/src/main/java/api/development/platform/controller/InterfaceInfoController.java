@@ -1,6 +1,8 @@
 package api.development.platform.controller;
 
 import api.development.apiplatform_client_sdk.client.NameClient;
+import api.development.apiplatform_interface.model.entity.InterfaceInfo;
+import api.development.apiplatform_interface.model.entity.User;
 import api.development.platform.annotation.AuthCheck;
 import api.development.platform.common.*;
 import api.development.platform.constant.CommonConstant;
@@ -11,12 +13,9 @@ import api.development.platform.model.dto.InterfaceInfo.InterfaceInfoAddRequest;
 import api.development.platform.model.dto.InterfaceInfo.InterfaceInfoInvokeRequest;
 import api.development.platform.model.dto.InterfaceInfo.InterfaceInfoQueryRequest;
 import api.development.platform.model.dto.InterfaceInfo.InterfaceInfoUpdateRequest;
-import api.development.platform.model.entity.InterfaceInfo;
-import api.development.platform.model.entity.User;
 import api.development.platform.model.enums.InterfaceStatusEnum;
 import api.development.platform.service.InterfaceInfoService;
 import api.development.platform.service.UserService;
-import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.gson.Gson;
@@ -183,7 +182,6 @@ public class InterfaceInfoController {
         User loginUser = userService.getLoginUser(httpServletRequest);
         String accessKey = loginUser.getAccessKey();
         String secretKey = loginUser.getSecretKey();
-        // todo 待后续修改为真实接口
         NameClient nc = new NameClient(accessKey, secretKey);
         Gson gson = new Gson();
         api.development.apiplatform_client_sdk.model.User user1 = gson.fromJson(requestParams, api.development.apiplatform_client_sdk.model.User.class);

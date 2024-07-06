@@ -1,5 +1,6 @@
 package api.development.platform.controller;
 
+import api.development.apiplatform_interface.model.entity.User;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import api.development.platform.annotation.AuthCheck;
 import api.development.platform.common.BaseResponse;
@@ -16,7 +17,6 @@ import api.development.platform.model.dto.user.UserQueryRequest;
 import api.development.platform.model.dto.user.UserRegisterRequest;
 import api.development.platform.model.dto.user.UserUpdateMyRequest;
 import api.development.platform.model.dto.user.UserUpdateRequest;
-import api.development.platform.model.entity.User;
 import api.development.platform.model.vo.LoginUserVO;
 import api.development.platform.model.vo.UserVO;
 import api.development.platform.service.UserService;

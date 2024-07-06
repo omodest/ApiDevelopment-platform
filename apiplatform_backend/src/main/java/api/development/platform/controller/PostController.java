@@ -1,5 +1,6 @@
 package api.development.platform.controller;
 
+import api.development.apiplatform_interface.model.entity.User;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import api.development.platform.annotation.AuthCheck;
@@ -15,7 +16,6 @@ import api.development.platform.model.dto.post.PostEditRequest;
 import api.development.platform.model.dto.post.PostQueryRequest;
 import api.development.platform.model.dto.post.PostUpdateRequest;
 import api.development.platform.model.entity.Post;
-import api.development.platform.model.entity.User;
 import api.development.platform.model.vo.PostVO;
 import api.development.platform.service.PostService;
 import api.development.platform.service.UserService;

@@ -1,5 +1,6 @@
 package api.development.platform.service.impl;
 
+import api.development.apiplatform_interface.model.entity.User;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -10,7 +11,6 @@ import api.development.platform.exception.BusinessException;
 import api.development.platform.mapper.PostFavourMapper;
 import api.development.platform.model.entity.Post;
 import api.development.platform.model.entity.PostFavour;
-import api.development.platform.model.entity.User;
 import api.development.platform.service.PostFavourService;
 import api.development.platform.service.PostService;
 import javax.annotation.Resource;

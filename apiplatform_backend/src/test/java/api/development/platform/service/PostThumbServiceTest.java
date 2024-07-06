@@ -1,7 +1,8 @@
 package api.development.platform.service;
 
-import api.development.platform.model.entity.User;
 import javax.annotation.Resource;
+
+import api.development.apiplatform_interface.model.entity.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

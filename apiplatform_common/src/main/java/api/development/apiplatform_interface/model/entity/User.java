@@ -1,4 +1,4 @@
-package api.development.platform.model.entity;
+package api.development.apiplatform_interface.model.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;

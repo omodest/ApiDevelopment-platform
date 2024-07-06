@@ -1,7 +1,7 @@
 package api.development.platform.mapper;
 
+import api.development.apiplatform_interface.model.entity.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import api.development.platform.model.entity.User;
 
 /**
  * 用户数据库操作

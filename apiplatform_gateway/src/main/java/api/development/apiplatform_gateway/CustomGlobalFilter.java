@@ -1,8 +1,13 @@
 package api.development.apiplatform_gateway;
 
-import api.development.apiplatform_client_sdk.model.User;
 import api.development.apiplatform_client_sdk.utils.SignUtils;
+import api.development.apiplatform_interface.model.entity.InterfaceInfo;
+import api.development.apiplatform_interface.model.entity.User;
+import api.development.apiplatform_interface.service.InnerInterfaceInfoService;
+import api.development.apiplatform_interface.service.InnerUserInterfaceInfoService;
+import api.development.apiplatform_interface.service.InnerUserService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.reactivestreams.Publisher;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -35,14 +40,14 @@ public class CustomGlobalFilter  implements
         GlobalFilter, // 全局异常接口
         Ordered // 执行顺序
 {
-//    @DubboReference
-//    private InnerUserService innerUserService;
-//
-//    @DubboReference
-//    private InnerInterfaceInfoService innerInterfaceInfoService;
-//
-//    @DubboReference
-//    private InnerUserInterfaceInfoService innerUserInterfaceInfoService;
+    @DubboReference
+    private InnerUserService innerUserService;
+
+    @DubboReference
+    private InnerInterfaceInfoService innerInterfaceInfoService;
+
+    @DubboReference
+    private InnerUserInterfaceInfoService innerUserInterfaceInfoService;
 
     private static final List<String> IP_WHITE_LIST = Arrays.asList("127.0.0.1");
 
@@ -65,9 +70,11 @@ public class CustomGlobalFilter  implements
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         // 1. 请求日志
         ServerHttpRequest request = exchange.getRequest();
+        String path = INTERFACE_HOST + request.getPath().value();
+        String method = request.getMethod().toString();
         log.info("请求唯一标识：" + request.getId());
-        log.info("请求路径：" + request.getPath());
-        log.info("请求方法：" + request.getMethod());
+        log.info("请求路径：" + path);
+        log.info("请求方法：" + method);
         log.info("请求参数：" + request.getQueryParams());
         String sourceAddress = request.getLocalAddress().getHostString();
         log.info("请求来源地址：" + sourceAddress);
@@ -85,10 +92,17 @@ public class CustomGlobalFilter  implements
         String timestamp = headers.getFirst("timestamp");
         String sign = headers.getFirst("sign");
         String body = headers.getFirst("body");
-        // todo 实际情况应该是去数据库中查是否已分配给用户
-        if (!"yupi".equals(accessKey)) {
+        // 获取当前用户
+        User invokeUser = null;
+        try {
+            invokeUser = innerUserService.getInvokeUser(accessKey);
+        } catch (Exception e) {
+            log.error("getInvokeUser error", e);
+        }
+        if (invokeUser == null) {
             return handleNoAuth(response);
         }
+
         if (Long.parseLong(nonce) > 10000L) {
             return handleNoAuth(response);
         }
@@ -99,23 +113,32 @@ public class CustomGlobalFilter  implements
             return handleNoAuth(response);
         }
         // 实际情况中是从数据库中查出 secretKey
-        String serverSign = SignUtils.getSignUtils(body, "admin.admin");
+        String serverSign = invokeUser.getSecretKey();
         if (sign == null || !sign.equals(serverSign)) {
             return handleNoAuth(response);
         }
         // 4. 判断接口是否存在
-//        todo 从数据库中查询模拟接口是否存在，以及请求方法是否匹配(还可以校验请求参数)
-        // 5. 请求转发，调用模拟接口
-        Mono<Void> filter = chain.filter(exchange);
-        // 响应日志
-        log.info("接口状态：" + response.getStatusCode());
-        if (response.getStatusCode() == HttpStatus.OK){
-
-        }else {
-            return handleInvokeError(response); // 调用失败，返回状态码
+        InterfaceInfo interfaceInfo = null;
+        try {
+            interfaceInfo = innerInterfaceInfoService.getInterfaceInfo(path, method);
+        } catch (Exception e) {
+            log.error("getInterfaceInfo error", e);
+        }
+        if (interfaceInfo == null) {
+            return handleNoAuth(response);
         }
 
-        return filter;
+        // 5. 请求转发，调用模拟接口
+//        Mono<Void> filter = chain.filter(exchange);
+        // 响应日志
+//        log.info("接口状态：" + response.getStatusCode());
+//        if (response.getStatusCode() == HttpStatus.OK){
+//
+//        }else {
+//            return handleInvokeError(response); // 调用失败，返回状态码
+//        }
+
+        return handleResponse(exchange, chain, interfaceInfo.getId(), invokeUser.getId());
     }
 
     @Override
@@ -172,7 +195,7 @@ public class CustomGlobalFilter  implements
                                     fluxBody.map(dataBuffer -> {
                                         // 7. 调用成功，接口调用次数 + 1 invokeCount
                                         try {
-//                                            innerUserInterfaceInfoService.invokeCount(interfaceInfoId, userId);
+                                            innerUserInterfaceInfoService.invokeCount(interfaceInfoId, userId);
                                         } catch (Exception e) {
                                             log.error("invokeCount error", e);
                                         }

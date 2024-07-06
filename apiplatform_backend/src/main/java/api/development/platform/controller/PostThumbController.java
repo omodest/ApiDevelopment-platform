@@ -1,11 +1,11 @@
 package api.development.platform.controller;
 
+import api.development.apiplatform_interface.model.entity.User;
 import api.development.platform.common.BaseResponse;
 import api.development.platform.common.ErrorCode;
 import api.development.platform.common.ResultUtils;
 import api.development.platform.exception.BusinessException;
 import api.development.platform.model.dto.postthumb.PostThumbAddRequest;
-import api.development.platform.model.entity.User;
 import api.development.platform.service.PostThumbService;
 import api.development.platform.service.UserService;
 import javax.annotation.Resource;

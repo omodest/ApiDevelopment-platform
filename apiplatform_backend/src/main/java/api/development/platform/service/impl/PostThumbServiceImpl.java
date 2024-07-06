@@ -1,5 +1,6 @@
 package api.development.platform.service.impl;
 
+import api.development.apiplatform_interface.model.entity.User;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import api.development.platform.common.ErrorCode;
@@ -7,7 +8,6 @@ import api.development.platform.exception.BusinessException;
 import api.development.platform.mapper.PostThumbMapper;
 import api.development.platform.model.entity.Post;
 import api.development.platform.model.entity.PostThumb;
-import api.development.platform.model.entity.User;
 import api.development.platform.service.PostService;
 import api.development.platform.service.PostThumbService;
 import javax.annotation.Resource;

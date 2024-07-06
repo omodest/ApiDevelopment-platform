@@ -1,7 +1,7 @@
 package api.development.platform.mapper;
 
 
-import api.development.platform.model.entity.InterfaceInfo;
+import api.development.apiplatform_interface.model.entity.InterfaceInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -11,7 +11,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 * @Entity generator.domain.InterfaceInfo
 */
 public interface InterfaceInfoMapper extends BaseMapper<InterfaceInfo> {
-
 }
 
 

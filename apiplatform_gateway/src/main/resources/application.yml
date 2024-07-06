@@ -7,8 +7,10 @@ spring:
         - id: path_route
           uri: http://localhost:8123
           predicates:
-            - Path=/api/**
-#            - Path=/api/{api_url}
+            - Path=/api/{api_url}
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 
 logging:
   level:
@@ -16,3 +18,12 @@ logging:
       springframework:
         cloud:
           gateway: trace
+dubbo:
+  application:
+    name: dubbo-springboot-demo-provider
+  protocol:
+    name: dubbo
+    port: 22221
+  registry:
+    id: nacos-registry
+    address: nacos://localhost:8848

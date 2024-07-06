@@ -1,9 +1,9 @@
 package api.development.platform.service;
 
+import api.development.apiplatform_interface.model.entity.User;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import api.development.platform.model.dto.user.UserQueryRequest;
-import api.development.platform.model.entity.User;
 import api.development.platform.model.vo.LoginUserVO;
 import api.development.platform.model.vo.UserVO;
 import java.util.List;

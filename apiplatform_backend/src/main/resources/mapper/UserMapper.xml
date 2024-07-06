@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="api.development.platform.mapper.UserMapper">
-    <resultMap id="BaseResultMap" type="api.development.platform.model.entity.User">
+    <resultMap id="BaseResultMap" type="api.development.apiplatform_interface.model.entity.User">
         <id property="id" column="id" jdbcType="BIGINT"/>
         <result property="unionId" column="unionId" jdbcType="VARCHAR"/>
         <result property="mpOpenId" column="mpOpenId" jdbcType="VARCHAR"/>
@@ -23,4 +23,5 @@
         userName,userAvatar,userProfile,
         userRole,accessKey,secretKey,createTime,updateTime,isDelete
     </sql>
+    <select id="selectOne" resultType="api.development.apiplatform_interface.model.entity.User"></select>
 </mapper>

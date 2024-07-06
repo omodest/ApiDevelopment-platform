@@ -2,6 +2,7 @@ package api.development.platform.service.impl;
 
 import static api.development.platform.constant.UserConstant.USER_LOGIN_STATE;
 
+import api.development.apiplatform_interface.model.entity.User;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -11,7 +12,6 @@ import api.development.platform.constant.CommonConstant;
 import api.development.platform.exception.BusinessException;
 import api.development.platform.mapper.UserMapper;
 import api.development.platform.model.dto.user.UserQueryRequest;
-import api.development.platform.model.entity.User;
 import api.development.platform.model.enums.UserRoleEnum;
 import api.development.platform.model.vo.LoginUserVO;
 import api.development.platform.model.vo.UserVO;

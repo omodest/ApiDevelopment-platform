@@ -1,5 +1,6 @@
 package api.development.platform.service.impl;
 
+import api.development.apiplatform_interface.model.entity.User;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -15,7 +16,6 @@ import api.development.platform.model.dto.post.PostQueryRequest;
 import api.development.platform.model.entity.Post;
 import api.development.platform.model.entity.PostFavour;
 import api.development.platform.model.entity.PostThumb;
-import api.development.platform.model.entity.User;
 import api.development.platform.model.vo.PostVO;
 import api.development.platform.model.vo.UserVO;
 import api.development.platform.service.PostService;

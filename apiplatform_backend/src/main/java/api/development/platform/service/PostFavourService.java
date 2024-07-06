@@ -1,12 +1,12 @@
 package api.development.platform.service;
 
+import api.development.apiplatform_interface.model.entity.User;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import api.development.platform.model.entity.Post;
 import api.development.platform.model.entity.PostFavour;
-import api.development.platform.model.entity.User;
 
 /**
  * 帖子收藏服务

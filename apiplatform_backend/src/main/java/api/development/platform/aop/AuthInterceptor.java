@@ -1,9 +1,9 @@
 package api.development.platform.aop;
 
+import api.development.apiplatform_interface.model.entity.User;
 import api.development.platform.annotation.AuthCheck; // 自定义注解
 import api.development.platform.common.ErrorCode;
 import api.development.platform.exception.BusinessException;
-import api.development.platform.model.entity.User;
 import api.development.platform.model.enums.UserRoleEnum;
 import api.development.platform.service.UserService;
 import org.aspectj.lang.ProceedingJoinPoint;

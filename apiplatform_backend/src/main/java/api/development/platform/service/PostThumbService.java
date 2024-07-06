@@ -1,8 +1,8 @@
 package api.development.platform.service;
 
+import api.development.apiplatform_interface.model.entity.User;
 import api.development.platform.model.entity.PostThumb;
 import com.baomidou.mybatisplus.extension.service.IService;
-import api.development.platform.model.entity.User;
 
 /**
  * 帖子点赞服务

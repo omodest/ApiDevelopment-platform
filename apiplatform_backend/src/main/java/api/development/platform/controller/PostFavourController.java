@@ -1,5 +1,6 @@
 package api.development.platform.controller;
 
+import api.development.apiplatform_interface.model.entity.User;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import api.development.platform.common.BaseResponse;
 import api.development.platform.common.ErrorCode;
@@ -10,7 +11,6 @@ import api.development.platform.model.dto.post.PostQueryRequest;
 import api.development.platform.model.dto.postfavour.PostFavourAddRequest;
 import api.development.platform.model.dto.postfavour.PostFavourQueryRequest;
 import api.development.platform.model.entity.Post;
-import api.development.platform.model.entity.User;
 import api.development.platform.model.vo.PostVO;
 import api.development.platform.service.PostFavourService;
 import api.development.platform.service.PostService;
