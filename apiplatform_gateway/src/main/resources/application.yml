@@ -7,7 +7,7 @@ spring:
         - id: path_route
           uri: http://localhost:8123
           predicates:
-            - Path=/api/{api_url}
+            - Path=/api/**
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration

@@ -27,8 +27,8 @@ public class InnerInterfaceInfoServiceImpl implements InnerInterfaceInfoService 
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         QueryWrapper<InterfaceInfo> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("url", url);
-        queryWrapper.eq("method", method);
+        queryWrapper.eq("interfaceUrl", url);
+        queryWrapper.eq("interfaceType", method);
         return interfaceInfoMapper.selectOne(queryWrapper);
     }
 }

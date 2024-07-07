@@ -52,7 +52,7 @@ public class NameClient {
     public String getUserNameByPost(User user){
         String jsonStr = JSONUtil.toJsonStr(user);
         // 使用HttpRequest工具发起POST请求，并获取服务器的响应
-        HttpResponse httpResponse = HttpRequest.post("http://localhost:8123/api/name/user")
+        HttpResponse httpResponse = HttpRequest.post("http://localhost:8111/api/name/user")
                 .body(jsonStr)
                 .addHeaders(getHeader(jsonStr)) // 设置操作
                 .execute();

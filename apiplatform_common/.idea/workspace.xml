@@ -5,70 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0704eda9-bf23-4b67-9590-35f12b590bc6" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/service/impl/inner/InnerInterfaceInfoServiceImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/service/impl/inner/InnerUserInterfaceInfoServiceImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/service/impl/inner/InnerUserServiceImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/api/development/apiplatform_interface/model/entity/InterfaceInfo.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/api/development/apiplatform_interface/model/entity/Post.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/api/development/apiplatform_interface/model/entity/UserInterfaceInfo.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/api/development/apiplatform_interface/model/enums/InterfaceInfoStatusEnum.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/api/development/apiplatform_interface/model/enums/PostGenderEnum.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/api/development/apiplatform_interface/model/enums/PostReviewStatusEnum.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/api/development/apiplatform_interface/model/vo/PostVO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/api/development/apiplatform_interface/model/vo/UserVO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/api/development/apiplatform_interface/service/InnerInterfaceInfoService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/api/development/apiplatform_interface/service/InnerUserInterfaceInfoService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/api/development/apiplatform_interface/service/InnerUserService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/apiplatform_interface-0.0.1.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/api/development/apiplatform_interface/model/entity/InterfaceInfo.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/api/development/apiplatform_interface/model/entity/Post.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/api/development/apiplatform_interface/model/entity/User.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/api/development/apiplatform_interface/model/entity/UserInterfaceInfo.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/api/development/apiplatform_interface/model/enums/InterfaceInfoStatusEnum.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/api/development/apiplatform_interface/model/enums/PostGenderEnum.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/api/development/apiplatform_interface/model/enums/PostReviewStatusEnum.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/api/development/apiplatform_interface/model/vo/PostVO.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/api/development/apiplatform_interface/model/vo/UserVO.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/api/development/apiplatform_interface/service/InnerInterfaceInfoService.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/api/development/apiplatform_interface/service/InnerUserInterfaceInfoService.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/api/development/apiplatform_interface/service/InnerUserService.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/maven-archiver/pom.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_backend/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/aop/AuthInterceptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/aop/AuthInterceptor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/controller/FileController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/controller/FileController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/controller/InterfaceInfoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/controller/InterfaceInfoController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/controller/PostController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/controller/PostController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/controller/PostFavourController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/controller/PostFavourController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/controller/PostThumbController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/controller/PostThumbController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/controller/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/controller/UserInterfaceInfoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/controller/UserInterfaceInfoController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/mapper/InterfaceInfoMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/mapper/InterfaceInfoMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/mapper/UserMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/mapper/UserMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/model/entity/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/api/development/apiplatform_interface/model/entity/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/service/InterfaceInfoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/service/InterfaceInfoService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/service/PostFavourService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/service/PostFavourService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/service/PostThumbService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/service/PostThumbService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/service/UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/service/impl/InterfaceInfoServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/service/impl/InterfaceInfoServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/service/impl/PostFavourServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/service/impl/PostFavourServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/service/impl/PostServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/service/impl/PostServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/service/impl/PostThumbServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/service/impl/PostThumbServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/service/impl/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/service/impl/UserServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_backend/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/src/main/resources/mapper/InterfaceInfoMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_backend/src/main/resources/mapper/InterfaceInfoMapper.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/src/main/resources/mapper/UserMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_backend/src/main/resources/mapper/UserMapper.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/src/test/java/api/development/platform/service/PostFavourServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_backend/src/test/java/api/development/platform/service/PostFavourServiceTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/src/test/java/api/development/platform/service/PostThumbServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_backend/src/test/java/api/development/platform/service/PostThumbServiceTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apiplatform_gateway/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_gateway/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../apiplatform_client_sdk/src/main/java/api/development/apiplatform_client_sdk/client/NameClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_client_sdk/src/main/java/api/development/apiplatform_client_sdk/client/NameClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../apiplatform_gateway/src/main/java/api/development/apiplatform_gateway/CustomGlobalFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_gateway/src/main/java/api/development/apiplatform_gateway/CustomGlobalFilter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../apiplatform_gateway/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_gateway/src/main/resources/application.yml" afterDir="false" />
     </list>
@@ -80,32 +18,32 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 2
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
   <component name="ProjectId" id="2iqnNV9P8Spz13yOHcnEL6ahPXm" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
     <option name="showMembers" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Maven.apiplatform_interface [install].executor": "Run",
-    "Maven.yuapi-common [install].executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "kotlin-language-version-configured": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Maven.apiplatform_interface [install].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.yuapi-common [install].executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration default="true" type="JetRunConfigurationType">
       <module name="apiplatform_common" />
@@ -130,6 +68,8 @@
       <option name="presentableId" value="Default" />
       <updated>1720226934790</updated>
       <workItem from="1720226936025" duration="3259000" />
+      <workItem from="1720273750746" duration="11000" />
+      <workItem from="1720274246742" duration="10000" />
     </task>
     <servers />
   </component>

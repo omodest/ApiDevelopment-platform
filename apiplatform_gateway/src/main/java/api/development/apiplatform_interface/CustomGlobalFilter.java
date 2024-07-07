@@ -1,6 +1,5 @@
-package api.development.apiplatform_gateway;
+package api.development.apiplatform_interface;
 
-import api.development.apiplatform_client_sdk.utils.SignUtils;
 import api.development.apiplatform_interface.model.entity.InterfaceInfo;
 import api.development.apiplatform_interface.model.entity.User;
 import api.development.apiplatform_interface.service.InnerInterfaceInfoService;
@@ -111,10 +110,9 @@ public class CustomGlobalFilter  implements
         if ((currentTime - Long.parseLong(timestamp)) >= FIVE_MINUTES) {
             return handleNoAuth(response);
         }
-        // 实际情况中是从数据库中查出 secretKey,然后加密，与请求头中的密码比对
+        // 实际情况中是从数据库中查出 secretKey
         String serverSign = invokeUser.getSecretKey();
-        String signUtils = SignUtils.getSignUtils(body, serverSign);
-        if (sign == null || !sign.equals(signUtils)) {
+        if (sign == null || !sign.equals(serverSign)) {
             return handleNoAuth(response);
         }
         // 4. 判断接口是否存在
@@ -127,6 +125,16 @@ public class CustomGlobalFilter  implements
         if (interfaceInfo == null) {
             return handleNoAuth(response);
         }
+
+        // 5. 请求转发，调用模拟接口
+//        Mono<Void> filter = chain.filter(exchange);
+        // 响应日志
+//        log.info("接口状态：" + response.getStatusCode());
+//        if (response.getStatusCode() == HttpStatus.OK){
+//
+//        }else {
+//            return handleInvokeError(response); // 调用失败，返回状态码
+//        }
 
         return handleResponse(exchange, chain, interfaceInfo.getId(), invokeUser.getId());
     }
