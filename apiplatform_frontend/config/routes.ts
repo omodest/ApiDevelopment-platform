@@ -47,6 +47,12 @@ export default [
         icon: 'table',
         path: '/admin/interface_info',
         component: './Admin/InterfaceInfo'
+      },
+      {
+        name: '接口分析',
+        icon: 'analysis',
+        path: '/admin/interface_analysis',
+        component: './Admin/InterfaceAnalysis'
       }
     ],
   },

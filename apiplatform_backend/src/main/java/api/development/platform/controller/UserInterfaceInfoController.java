@@ -1,6 +1,7 @@
 package api.development.platform.controller;
 
 import api.development.apiplatform_interface.model.entity.User;
+import api.development.apiplatform_interface.model.entity.UserInterfaceInfo;
 import api.development.platform.annotation.AuthCheck;
 import api.development.platform.common.*;
 import api.development.platform.constant.CommonConstant;
@@ -10,7 +11,6 @@ import api.development.platform.exception.ThrowUtils;
 import api.development.platform.model.dto.userInterfaceInfo.UserInterfaceInfoAddRequest;
 import api.development.platform.model.dto.userInterfaceInfo.UserInterfaceInfoQueryRequest;
 import api.development.platform.model.dto.userInterfaceInfo.UserInterfaceInfoUpdateRequest;
-import api.development.platform.model.entity.UserInterfaceInfo;
 import api.development.platform.service.UserInterfaceInfoService;
 import api.development.platform.service.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;

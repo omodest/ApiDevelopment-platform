@@ -1,7 +1,6 @@
 package api.development.platform.service;
 
-import api.development.platform.model.entity.InterfaceInfo;
-import api.development.platform.model.entity.UserInterfaceInfo;
+import api.development.apiplatform_interface.model.entity.UserInterfaceInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**

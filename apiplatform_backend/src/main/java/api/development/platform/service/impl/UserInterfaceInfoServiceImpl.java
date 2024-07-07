@@ -1,11 +1,10 @@
 package api.development.platform.service.impl;
 
+import api.development.apiplatform_interface.model.entity.UserInterfaceInfo;
 import api.development.platform.common.ErrorCode;
 import api.development.platform.exception.BusinessException;
-import api.development.platform.model.entity.InterfaceInfo;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import api.development.platform.model.entity.UserInterfaceInfo;
 import api.development.platform.service.UserInterfaceInfoService;
 import api.development.platform.mapper.UserInterfaceInfoMapper;
 import org.springframework.stereotype.Service;

@@ -1,7 +1,9 @@
 package api.development.platform.mapper;
 
-import api.development.platform.model.entity.UserInterfaceInfo;
+import api.development.apiplatform_interface.model.entity.UserInterfaceInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import java.util.List;
 
 /**
 * @author poise
@@ -10,7 +12,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 * @Entity api.development.platform.model.entity.UserInterfaceInfo
 */
 public interface UserInterfaceInfoMapper extends BaseMapper<UserInterfaceInfo> {
-
+    List<UserInterfaceInfo> listTopInvokeInterfaceInfo(int limit);
 }
 
 
