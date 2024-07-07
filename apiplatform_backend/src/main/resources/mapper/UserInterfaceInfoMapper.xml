@@ -23,7 +23,7 @@
     </sql>
     <select id="listTopInvokeInterfaceInfo"
             resultType="api.development.apiplatform_interface.model.entity.UserInterfaceInfo">
-        select interfaceInfoId,sum(totalNum) from user_interface_info
+        select interfaceInfoId,sum(totalNum) as TotalNum from user_interface_info
         group by interfaceInfoId
         order by totalNum
                 desc limit #{limit};
