@@ -16,12 +16,17 @@
         <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
         <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
         <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+        <result property="sex" column="sex" jdbcType="VARCHAR"/>
+        <result property="age" column="age" jdbcType="INTEGER"/>
+        <result property="qq" column="qq" jdbcType="VARCHAR"/>
+        <result property="telephone" column="telephone" jdbcType="VARCHAR"/>
+        <result property="kunCoin" column="kunCoin" jdbcType="INTEGER"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         id,unionId,mpOpenId,
         userName,userAvatar,userProfile,
-        userRole,accessKey,secretKey,createTime,updateTime,isDelete
+        userRole,accessKey,secretKey,createTime,updateTime,isDelete,sex,age,qq,telephone,kunCoin
     </sql>
     <select id="selectOne" resultType="api.development.apiplatform_interface.model.entity.User"></select>
 </mapper>

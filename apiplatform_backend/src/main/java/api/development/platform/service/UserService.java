@@ -115,4 +115,11 @@ public interface UserService extends IService<User> {
      */
     QueryWrapper<User> getQueryWrapper(UserQueryRequest userQueryRequest);
 
+    /**
+     * 修改用户签名和密钥（直接重新生成）
+     * @param user
+     * @return
+     */
+    boolean updateSignature(User user);
+
 }

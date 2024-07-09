@@ -57,7 +57,11 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
           history.replace('/user/login',{redirect})
           return;
         }
-        history.push(`/account/${key}`);
+      else if(key === 'center'){
+        history.replace('/user/UserInfo')
+      }else if(key === 'settings'){
+
+      }
       },
       [setInitialState],
     );
@@ -85,23 +89,16 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
   }
 
   const menuItems = [
-    ...(menu
-      ? [
-          {
-            key: 'center',
-            icon: <UserOutlined />,
-            label: '个人中心',
-          },
-          {
-            key: 'settings',
-            icon: <SettingOutlined />,
-            label: '个人设置',
-          },
-          {
-            type: 'divider' as const,
-          },
-        ]
-      : []),
+    {
+      key: 'center',
+      icon: <UserOutlined />,
+      label: '个人中心',
+    },
+    {
+      key: 'settings',
+      icon: <SettingOutlined />,
+      label: '充点小钱',
+    },
     {
       key: 'logout',
       icon: <LogoutOutlined />,
@@ -110,6 +107,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
   ];
 
   return (
+    // 头像下拉框
     <HeaderDropdown
       menu={{
         selectedKeys: [],

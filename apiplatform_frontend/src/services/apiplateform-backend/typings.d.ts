@@ -282,8 +282,13 @@ declare namespace API {
   };
 
   type LoginUserVO = {
+    age?: number;
     createTime?: string;
     id?: number;
+    kunCoin?: number;
+    qq?: string;
+    sex?: string;
+    telephone?: string;
     updateTime?: string;
     userAvatar?: string;
     userName?: string;
@@ -461,11 +466,16 @@ declare namespace API {
 
   type User = {
     accessKey?: string;
+    age?: number;
     createTime?: string;
     id?: number;
     isDelete?: number;
+    kunCoin?: number;
     mpOpenId?: string;
+    qq?: string;
     secretKey?: string;
+    sex?: string;
+    telephone?: string;
     unionId?: string;
     updateTime?: string;
     userAccount?: string;
@@ -477,6 +487,10 @@ declare namespace API {
   };
 
   type UserAddRequest = {
+    age?: number;
+    qq?: string;
+    sex?: string;
+    telephone?: string;
     userAccount?: string;
     userAvatar?: string;
     userName?: string;
@@ -520,12 +534,16 @@ declare namespace API {
   };
 
   type UserQueryRequest = {
+    age?: number;
     current?: number;
     id?: number;
     mpOpenId?: string;
     pageSize?: number;
+    qq?: string;
+    sex?: string;
     sortField?: string;
     sortOrder?: string;
+    telephone?: string;
     unionId?: string;
     userName?: string;
     userProfile?: string;
@@ -539,13 +557,21 @@ declare namespace API {
   };
 
   type UserUpdateMyRequest = {
+    age?: number;
+    qq?: string;
+    sex?: string;
+    telephone?: string;
     userAvatar?: string;
     userName?: string;
     userProfile?: string;
   };
 
   type UserUpdateRequest = {
+    age?: number;
     id?: number;
+    qq?: string;
+    sex?: string;
+    telephone?: string;
     userAvatar?: string;
     userName?: string;
     userProfile?: string;

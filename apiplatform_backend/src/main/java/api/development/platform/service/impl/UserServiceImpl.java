@@ -277,4 +277,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 sortField);
         return queryWrapper;
     }
+
+    @Override
+    public boolean updateSignature(User user) {
+        String accessKey = user.getAccessKey();
+        String secretKey = user.getSecretKey();
+        accessKey = DigestUtils.md5Digest((SALT + accessKey + RandomUtil.randomNumbers(6)).getBytes()).toString();
+        secretKey = DigestUtils.md5Digest((SALT + secretKey + RandomUtil.randomNumbers(6)).getBytes()).toString();
+        user.setAccessKey(accessKey);
+        user.setSecretKey(secretKey);
+        boolean flag = this.updateById(user);
+        if (!flag){
+            throw new BusinessException(ErrorCode.OPERATION_ERROR,"保存失败");
+        }
+        return true;
+    }
 }

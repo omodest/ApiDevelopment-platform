@@ -43,9 +43,35 @@ public class User implements Serializable {
     private String mpOpenId;
 
     /**
+     * 性别
+     */
+    private String sex;
+
+    /**
+     * 年龄
+     */
+    private int age;
+
+    /**
+     * qq邮箱
+     */
+    private String qq;
+
+    /**
+     * 电话号码
+     */
+    private String telephone;
+
+
+    /**
      * 用户昵称
      */
     private String userName;
+
+    /**
+     * 坤币
+     */
+    private int kunCoin;
 
     /**
      * 用户头像

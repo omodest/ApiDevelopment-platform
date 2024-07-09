@@ -150,6 +150,14 @@ export async function userRegisterUsingPost(
   });
 }
 
+/** updateASKey GET /api/user/updata/askey */
+export async function updateAsKeyUsingGet(options?: { [key: string]: any }) {
+  return request<API.BaseResponseBoolean_>('/api/user/updata/askey', {
+    method: 'GET',
+    ...(options || {}),
+  });
+}
+
 /** updateUser POST /api/user/update */
 export async function updateUserUsingPost(
   body: API.UserUpdateRequest,

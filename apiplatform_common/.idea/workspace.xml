@@ -5,10 +5,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0704eda9-bf23-4b67-9590-35f12b590bc6" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../apiplatform_client_sdk/src/main/java/api/development/apiplatform_client_sdk/client/NameClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_client_sdk/src/main/java/api/development/apiplatform_client_sdk/client/NameClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/model/dto/user/UserAddRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/model/dto/user/UserAddRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/model/dto/user/UserQueryRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/model/dto/user/UserQueryRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/model/dto/user/UserUpdateMyRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/model/dto/user/UserUpdateMyRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/model/dto/user/UserUpdateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/model/dto/user/UserUpdateRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/model/vo/LoginUserVO.java" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_backend/src/main/java/api/development/platform/model/vo/LoginUserVO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../apiplatform_backend/src/main/resources/mapper/UserMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_backend/src/main/resources/mapper/UserMapper.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apiplatform_gateway/src/main/java/api/development/apiplatform_gateway/CustomGlobalFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_gateway/src/main/java/api/development/apiplatform_gateway/CustomGlobalFilter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../apiplatform_gateway/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_gateway/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/api/development/apiplatform_interface/model/entity/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/api/development/apiplatform_interface/model/entity/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/apiplatform_interface-0.0.1.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/apiplatform_interface-0.0.1.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/api/development/apiplatform_interface/model/entity/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/api/development/apiplatform_interface/model/entity/User.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../apiplatform_frontend/config/config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_frontend/config/config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../apiplatform_frontend/config/defaultSettings.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_frontend/config/defaultSettings.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../apiplatform_frontend/config/routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_frontend/config/routes.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../apiplatform_frontend/src/components/HeaderDropdown/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_frontend/src/components/HeaderDropdown/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../apiplatform_frontend/src/components/RightContent/AvatarDropdown.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_frontend/src/components/RightContent/AvatarDropdown.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../apiplatform_frontend/src/components/RightContent/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_frontend/src/components/RightContent/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../apiplatform_frontend/src/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_frontend/src/manifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../apiplatform_frontend/src/pages/Admin.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_frontend/src/pages/Admin.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../apiplatform_frontend/src/pages/User/Login/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_frontend/src/pages/User/Login/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../apiplatform_frontend/src/pages/User/Login/login.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../apiplatform_frontend/src/pages/User/Login/login.test.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,6 +47,7 @@
   &quot;keyToString&quot;: {
     &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;Maven.apiplatform_interface [install].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.apiplatform_interface [verify].executor&quot;: &quot;Run&quot;,
     &quot;Maven.yuapi-common [install].executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
@@ -70,6 +87,9 @@
       <workItem from="1720226936025" duration="3259000" />
       <workItem from="1720273750746" duration="11000" />
       <workItem from="1720274246742" duration="10000" />
+      <workItem from="1720534454320" duration="343000" />
+      <workItem from="1720535988800" duration="157000" />
+      <workItem from="1720536957952" duration="22000" />
     </task>
     <servers />
   </component>

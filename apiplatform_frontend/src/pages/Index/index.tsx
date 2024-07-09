@@ -11,7 +11,6 @@ const Index: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [list, setList] = useState<API.InterfaceInfo[]>([]);
   const [total, setTotal] = useState<number>(0);
-
   // 请求后端拿到数据
   const loadData = async (current = 1, pageSize = 5) => {
     setLoading(true);

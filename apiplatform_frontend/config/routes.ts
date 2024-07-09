@@ -38,6 +38,11 @@ export default [
         path: '/user/register',
         component: './User/Register',
       },
+      {
+        name: '个人信息',
+        path: '/user/userInfo',
+        component: './User/UserInfo',
+      },
     ],
   },
 

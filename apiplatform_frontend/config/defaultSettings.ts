@@ -15,9 +15,9 @@ const Settings: ProLayoutProps & {
   fixedHeader: true,
   fixSiderbar: true,
   colorWeak: false,
-  title: 'Ant Design Pro',
+  title: '谱拙 API',
   pwa: true,
-  logo: 'https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg',
+  logo: 'https://img.php.cn/upload/article/000/000/164/bdaf4de94b87668638fd3604532e0090.jpg',
   iconfontUrl: '',
   splitMenus: false,
   menu: {

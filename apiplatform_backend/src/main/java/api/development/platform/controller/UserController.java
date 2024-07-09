@@ -316,4 +316,12 @@ public class UserController {
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(true);
     }
+
+    @GetMapping("/updata/askey")
+    public BaseResponse<Boolean> updateASKey(HttpServletRequest httpServletRequest){
+        User loginUser = userService.getLoginUser(httpServletRequest);
+        boolean result = userService.updateSignature(loginUser);
+        return ResultUtils.success(result);
+
+    }
 }
