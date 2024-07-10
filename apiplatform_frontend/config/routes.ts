@@ -64,6 +64,12 @@ export default [
         icon: 'analysis',
         path: '/admin/interface_analysis',
         component: './Admin/InterfaceAnalysis'
+      },
+      {
+        name: '用户管理',
+        icon: 'user',
+        path: '/admin/user_Manage',
+        component: './Admin/UserManage'
       }
     ],
   },

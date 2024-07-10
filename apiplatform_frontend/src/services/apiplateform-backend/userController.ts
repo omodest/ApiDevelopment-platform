@@ -16,8 +16,8 @@ export async function addUserUsingPost(body: API.UserAddRequest, options?: { [ke
 
 /** deleteUser POST /api/user/delete */
 export async function deleteUserUsingPost(
-  body: API.DeleteRequest,
-  options?: { [key: string]: any },
+  body: { id: string },
+  options?: { [p: string]: any },
 ) {
   return request<API.BaseResponseBoolean_>('/api/user/delete', {
     method: 'POST',
@@ -160,8 +160,8 @@ export async function updateAsKeyUsingGet(options?: { [key: string]: any }) {
 
 /** updateUser POST /api/user/update */
 export async function updateUserUsingPost(
-  body: API.UserUpdateRequest,
-  options?: { [key: string]: any },
+  body: { createTime?: string; userAvatar?: string; id: any | number; userName?: string; userRole?: string; userProfile?: string },
+  options?: { [p: string]: any },
 ) {
   return request<API.BaseResponseBoolean_>('/api/user/update', {
     method: 'POST',
