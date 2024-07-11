@@ -43,6 +43,11 @@ export default [
         path: '/user/userInfo',
         component: './User/UserInfo',
       },
+      {
+        name: '充值',
+        path: '/user/getCoin',
+        component: './User/GetCoin',
+      },
     ],
   },
 

@@ -3,11 +3,23 @@ import {
   getLoginUserUsingGet,
   updateAsKeyUsingGet
 } from '@/services/apiplateform-backend/userController';
-import {Card, Avatar, Spin, Button, message} from 'antd';
+import {Card, Spin, Button, message, Upload, UploadFile, Modal, Descriptions, UploadProps} from 'antd';
 import {history} from "@@/core/history";
 import {updateMyUserUsingPost} from "@/services/apiform_backend/userController";
+import {RcFile} from "antd/es/upload";
+import {PlusOutlined} from "@ant-design/icons";
+import ImgCrop from "antd-img-crop";
+import {requestConfig} from "@/requestConfig";
+import initialState from "@@/plugin-initialState/@@initialState";
 
 const Login: React.FC = () => {
+  const unloadFileTypeList = ["image/jpeg", "image/jpg", "image/svg", "image/png", "image/webp", "image/jfif"]
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const handleCancel = () => setPreviewOpen(false);
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [previewImage, setPreviewImage] = useState('');
+  const [previewTitle, setPreviewTitle] = useState('');
+  const {loginUser} = initialState || {}
   const [data, setData] = useState<API.UserVO | null>(null);
   const [loading, setLoading] = useState<boolean>(true); // 添加loading状态
   const [isUpdating, setIsUpdating] = useState(false);
@@ -27,6 +39,20 @@ const Login: React.FC = () => {
       try {
         const result = await getLoginUserUsingGet();
         setData(result);
+        // 这里是初始化头像哦！！！！
+        const updatedFileList = [...fileList];
+        if (result.data  && result.data.userAvatar) {
+          updatedFileList[0] = {
+            // @ts-ignore
+            uid: result.data.userAccount,
+            // @ts-ignore
+            name: result.data.userAvatar.substring(result.data.userAvatar!.lastIndexOf('-') + 1),
+            status: "done",
+            percent: 100,
+            url: result.data.userAvatar
+          }
+          setFileList(updatedFileList);
+        }
         setEditedData({ // 初始化抽屉数据
           userAvatar: result?.data.userAvatar || "",
           userName: result?.data.userName || '',
@@ -58,6 +84,7 @@ const Login: React.FC = () => {
   const minutes = String(dat.getMinutes()).padStart(2, '0');
   const seconds = String(dat.getSeconds()).padStart(2, '0');
   const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
   // 修改签名
   const updateASKey = async () => {
     if (isUpdating) return; // 如果正在更新，直接返回，不执行下面的代码
@@ -79,7 +106,7 @@ const Login: React.FC = () => {
       history.push('/'); // 使用原生API返回上一个页面
   };
 
-  // 修改个人信息
+  // 编辑状态
   const handleEditToggle = () => { // 展示为编辑框
     if (editable){
       setEditable(!editable);
@@ -91,13 +118,15 @@ const Login: React.FC = () => {
 
   };
 
-  const handleChange = (e) => {
+  let handleChange = (e) => {
     const { name, value } = e.target;
+    console.log(`Updating ${name} to ${value}`);
     setEditedData(prevState => ({
       ...prevState,
       [name]: value,
     }));
   };
+
 
   const handleSave = async () => { //  保存修改按钮
     try {
@@ -112,121 +141,247 @@ const Login: React.FC = () => {
     }
   };
 
+  // region 头像处理
+
+  const getBase64 = (file: RcFile): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+  // 预览图片功能在这
+  const handlePreview = async (file: UploadFile) => {
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj as RcFile);
+    }
+    const previewImageUrl = file.preview || file.url || data?.data?.userAvatar;
+    setPreviewImage(previewImageUrl);
+    setPreviewOpen(true);
+    setPreviewTitle(file.name || file.url!.substring(file.url!.lastIndexOf('-') + 1));
+  };
+
+  const uploadButton = () => {
+    return (
+      <div>
+        <PlusOutlined/>
+        <div style={{marginTop: 8}}>Upload</div>
+      </div>
+    );
+  }
+  // 上传前的图片修改
+  const beforeUpload = async (file: RcFile) => {
+    const fileType = unloadFileTypeList.includes(file.type);
+    if (!fileType) {
+      message.error('图片类型有误，请上传 jpg/png/svg/jpeg/webp 格式！');
+    }
+    const isLt2M = file.size / 1024 / 1024 < 1;
+    if (!isLt2M) {
+      message.error('文件大小不能超过 1M！');
+    }
+    if (!isLt2M || !fileType) {
+      const updatedFileList = [...fileList];
+      updatedFileList[0] = {
+        uid: loginUser?.userAccount,
+        name: "error",
+        status: "error",
+        percent: 100
+      };
+      setFileList(updatedFileList);
+      return false;
+    }
+    return true;
+  };
+
+
+  const props: UploadProps = {
+    name: 'file',
+    withCredentials: true,
+    action: `${requestConfig.baseURL}/api/file/upload?biz=user_avatar`, // 调用后端上传文件的接口
+    onChange: async ({ file, fileList: newFileList }) => {
+      const { response } = file;
+      if (response && response.data) {
+        const { status, url } = response.data;
+        const updatedFileList = [...fileList];
+        if (response.code !== 0 || status === 'error') {
+          message.error(response.message);
+          file.status = "error";
+          updatedFileList[0] = {
+            uid: loginUser?.userAccount,
+            name: loginUser?.userAvatar ? loginUser?.userAvatar?.substring(loginUser?.userAvatar!.lastIndexOf('-') + 1) : "error",
+            status: "error",
+            percent: 100
+          };
+          setFileList(updatedFileList);
+        } else {
+          file.status = status;
+          updatedFileList[0] = {
+            uid: loginUser?.userAccount,
+            name: loginUser?.userAvatar?.substring(loginUser?.userAvatar!.lastIndexOf('-') + 1),
+            status: status,
+            url: response.data,
+            percent: 100
+          };
+          setFileList(updatedFileList);
+          // 更新 editedData 中的 userAvatar（因为我前端和后端的头像字段名对应不上，所以在这里更新一下）
+          setEditedData(prevState => ({
+            ...prevState,
+            userAvatar: response.data
+          }));
+        }
+      } else {
+        setFileList(newFileList);
+      }
+    },
+    listType: "picture-circle",
+    onPreview: handlePreview,
+    fileList: fileList,
+    beforeUpload: beforeUpload,
+    maxCount: 1,
+    progress: {
+      strokeColor: {
+        '0%': '#108ee9',
+        '100%': '#87d068',
+      },
+      strokeWidth: 3,
+      format: percent => percent && `${parseFloat(percent.toFixed(2))}%`,
+    },
+  };
+  // endregion
+
+
   // 如果数据加载完成，渲染用户信息卡片
   return (
-    <div className="site-card-border-less-wrapper">
-      <Card title="用户简介：" bordered={false} style={{ width: '100%'}}>
-        {data.data && (
-          <>
-            <div style={{ textAlign: 'center', marginBottom: 10 }}>
-              <Avatar size={200} src={data.data.userAvatar} />
-            </div>
-            <p><strong>Id: </strong> {data.data.id}</p>
-            <p><strong>用户名: </strong>
-              {editable ? (
-                <input
-                  type="text"
-                  name="userName"
-                  value={editedData.userName}
-                  onChange={handleChange}
-                />
-              ) : (
-                <span>{editedData.userName}</span>
-              )}</p>
-            <p><strong>性别: </strong>
-              {editable ? (
-                <input
-                  type="text"
-                  name="sex"
-                  value={editedData.sex}
-                  onChange={handleChange}
-                />
-              ) : (
-                <span>{editedData.sex}</span>
-              )}</p>
-            <p><strong>电话号码: </strong>
-              {editable ? (
-                <input
-                  type="text"
-                  name="telephone"
-                  value={editedData.telephone}
-                  onChange={handleChange}
-                />
-              ) : (
-                <span>{editedData.telephone}</span>
-              )}</p>
-            <p><strong>邮箱: </strong>
-              {editable ? (
-                <input
-                  type="text"
-                  name="qq"
-                  value={editedData.qq}
-                  onChange={handleChange}
-                />
-              ) : (
-                <span>{editedData.qq}</span>
-              )}</p>
-            <p><strong>坤币: </strong>{data.data.kunCoin}</p>
-            <p><strong>个人简介: </strong>
-              {editable ? (
-                <textarea
-                  type="text"
-                  name="userProfile"
-                  value={editedData.userProfile}
-                  onChange={handleChange}
-                />
-              ) : (
-                <span>{editedData.userProfile}</span>
-              )}</p>
-            <p><strong>用户等级: </strong>{data.data.userRole === 'admin' ? '管理员' : '普通用户'}</p>
-            <p><strong>注册时间: </strong>{formattedDateTime}</p>
-            <p><strong>头像链接: </strong>
-              {editable ? (
-                <input
-                  type="text"
-                  name="userAvatar"
-                  value={editedData.userAvatar}
-                  onChange={handleChange}
-                />
-              ) : (
-                <span>{editedData.userAvatar}</span>
-              )}</p>
-          </>
-        )}
-      </Card>
+      <div  style={{ margin: '0 auto', width: '80%' }}>
+        {/*用户信息展示*/}
+        <div className="site-card-border-less-wrapper">
+          <Card hoverable={true} type="inner" title="用户简介：" bordered={false}>
+            {data?.data && (
+              <>
+                <Descriptions.Item>
+                  <ImgCrop
+                    rotationSlider
+                    quality={1}
+                    aspectSlider
+                    maxZoom={4}
+                    cropShape={"round"}
+                    zoomSlider
+                    showReset
+                  >
+                    <Upload {...props}>
+                      {fileList.length >= 1 ? undefined : uploadButton()}
+                    </Upload>
+                  </ImgCrop>
+                  <Modal open={previewOpen} title={previewTitle} footer={null} onCancel={handleCancel}>
+                    <img alt="example" style={{width: '100%'}} src={previewImage}/>
+                  </Modal>
+                </Descriptions.Item>
+                <p><strong>Id: </strong>{data.data.id}</p>
+                <p><strong>用户名: </strong>
+                  {editable ? (
+                    <input
+                      className="edit-input"
+                      type="text"
+                      name="userName"
+                      value={editedData.userName}
+                      onChange={handleChange}
+                    />
+                  ) : (
+                    <span>{editedData.userName}</span>
+                  )}
+                </p>
+                <p><strong>性别: </strong>
+                  {editable ? (
+                    <input
+                      className="edit-input"
+                      type="text"
+                      name="sex"
+                      value={editedData.sex}
+                      onChange={handleChange}
+                    />
+                  ) : (
+                    <span>{editedData.sex}</span>
+                  )}
+                </p>
+                <p><strong>电话号码: </strong>
+                  {editable ? (
+                    <input
+                      className="edit-input"
+                      type="text"
+                      name="telephone"
+                      value={editedData.telephone}
+                      onChange={handleChange}
+                    />
+                  ) : (
+                    <span>{editedData.telephone}</span>
+                  )}
+                </p>
+                <p><strong>邮箱: </strong>
+                  {editable ? (
+                    <input
+                      className="edit-input"
+                      type="text"
+                      name="qq"
+                      value={editedData.qq}
+                      onChange={handleChange}
+                    />
+                  ) : (
+                    <span>{editedData.qq}</span>
+                  )}
+                </p>
+                <p><strong>坤币: </strong>{data.data.kunCoin}</p>
+                <p><strong>个人简介: </strong>
+                  {editable ? (
+                    <textarea
+                      className="edit-textarea"
+                      type="text"
+                      name="userProfile"
+                      value={editedData.userProfile}
+                      onChange={handleChange}
+                    />
+                  ) : (
+                    <span>{editedData.userProfile}</span>
+                  )}
+                </p>
+                <p><strong>用户等级: </strong>{data.data.userRole === 'admin' ? '管理员' : '普通用户'}</p>
+                <p><strong>注册时间: </strong>{formattedDateTime}</p>
+              </>
+            )}
+          </Card>
 
-      <Card>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Button type="primary" onClick={handleEditToggle} style={{ marginRight: 10 }}>
-            点我修改个人信息
-          </Button>
-          {editable && (
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <Button type="primary" onClick={handleSave} style={{ marginRight: 10 }}>
-                确认
-              </Button>
+          <Card  type="inner" >
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 20 }}>
               <Button type="primary" onClick={handleEditToggle}>
-                取消
+                点我修改个人信息
               </Button>
+              {editable && (
+                <div>
+                  <Button type="primary" onClick={handleSave}>
+                    确认修改
+                  </Button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <Button type="primary" onClick={handleEditToggle}>
+                    不修改了
+                  </Button>
+                </div>
+              )}
             </div>
-          )}
-        </div>
 
-      </Card>
-      <Card>
-        <div>
-          <Button type="primary" onClick={updateASKey} disabled={isUpdating}>
-            {isUpdating ? '正在更新...' : '点我更换签名和密钥'}
-          </Button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <Button type="primary">点我去充值</Button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <Button type="primary" onClick={handleGoBack}>点我回主页</Button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <Button type="primary">查看我的订单</Button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <Button type="primary">邀请好友</Button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <Button type="primary">签到</Button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        </div>
+          </Card>
+          <Card title="用户操作："  type="inner" hoverable={true} >
+            <div >
+              <Button type="primary" onClick={updateASKey} disabled={isUpdating}>
+                {isUpdating ? '正在更新...' : '点我更换签名和密钥'}
+              </Button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <Button type="primary">点我去充值</Button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <Button type="primary" onClick={handleGoBack}>点我回主页</Button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <Button type="primary">查看我的订单</Button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <Button type="primary">邀请好友</Button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <Button type="primary">签到</Button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </div>
 
-      </Card>
-    </div>
+          </Card>
+        </div>
+      </div>
   );
 };
 
