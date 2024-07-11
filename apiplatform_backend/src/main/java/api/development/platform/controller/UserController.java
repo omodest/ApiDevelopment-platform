@@ -211,8 +211,13 @@ public class UserController {
         if (userUpdateRequest == null || userUpdateRequest.getId() == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
+        User loginUser = userService.getLoginUser(request);
         User user = new User();
         BeanUtils.copyProperties(userUpdateRequest, user);
+        // remark 因为这里使用的是copyProperties，所以一些没有赋值的字段可能为空，这里可能出现数据修改错误的小bug
+        user.setId(loginUser.getId());
+        user.setKunCoin(loginUser.getKunCoin());
+        user.setAge(loginUser.getAge());
         boolean result = userService.updateById(user);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(true);
@@ -311,7 +316,10 @@ public class UserController {
         User loginUser = userService.getLoginUser(request);
         User user = new User();
         BeanUtils.copyProperties(userUpdateMyRequest, user);
+        // remark 因为这里使用的是copyProperties，所以一些没有赋值的字段可能为空，这里可能出现数据修改错误的小bug
         user.setId(loginUser.getId());
+        user.setKunCoin(loginUser.getKunCoin());
+        user.setAge(loginUser.getAge());
         boolean result = userService.updateById(user);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(true);

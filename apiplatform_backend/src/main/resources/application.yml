@@ -81,13 +81,10 @@ wx:
     appId: xxx
     appSecret: xxx
 # 对象存储
-# todo 需替换配置
+# todo 需替换配置  这里的密钥不能提交的git上，推送会失败
 cos:
   client:
-    accessKey: xxx
-    secretKey: xxx
-    region: xxx
-    bucket: xxx
+
 # 接口文档配置
 knife4j:
   enable: true

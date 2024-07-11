@@ -6,20 +6,21 @@ import {
   ProDescriptions,
   ProTable,
 } from '@ant-design/pro-components';
-import { FormattedMessage, useIntl } from 'umi';
-import { Button, Drawer, message, Image } from 'antd';
-import React, {useEffect, useRef, useState} from 'react';
-import CreateModal from './components/CreateModal'; // 假设路径需要根据实际情况修改
-import UpdateModal from './components/UpdateModal'; // 假设路径需要根据实际情况修改
+import { Image } from "antd";
+import { FormattedMessage, useIntl } from '@umijs/max';
+import { Button, Drawer, message } from 'antd';
+import React, { useEffect, useRef, useState } from 'react';
+import CreateModal from "@/pages/Admin/InterfaceInfo/components/CreateModal";
+import UpdateModal from "@/pages/Admin/InterfaceInfo/components/UpdateModal";
 import {
   addUserUsingPost,
   deleteUserUsingPost,
   listUserVoByPageUsingPost,
-  updateUserUsingPost,
-} from '@/services/apiplateform-backend/userController'; // 假设路径需要根据实际情况修改
+  updateUserUsingPost
+} from "@/services/apiplateform-backend/userController";
 
 interface UserVO {
-  id: string;
+  id: number;
   userName: string;
   avatarUrl: string;
   userRole: string;
@@ -31,23 +32,21 @@ const TableList: React.FC = () => {
   const [createModalVisible, handleModalVisible] = useState<boolean>(false);
   const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
   const [showDetail, setShowDetail] = useState<boolean>(false);
+
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<UserVO | undefined>();
+  const [currentRow, setCurrentRow] = useState<UserVO>();
   const [selectedRowsState, setSelectedRows] = useState<UserVO[]>([]);
   const [dataSource, setDataSource] = useState<UserVO[]>([]);
+
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    fetchData().then(() =>
-      console.log("加载数据")
-    );
+    fetchData();
   }, []);
-  // 加载所有用户数据
+
   const fetchData = async () => {
     try {
       const response = await listUserVoByPageUsingPost({});
       if (response?.code === 0) {
-        // 如果返回的 code 是 0，表示成功
-        setDataSource(response.data.records); // 假设 records 是你需要的数据数组
+        setDataSource(response.data.records);
       } else {
         message.error(response.message || '请求失败');
       }
@@ -56,8 +55,7 @@ const TableList: React.FC = () => {
     }
   };
 
-
-  const handleAdd = async (fields: Partial<UserVO>) => {
+  const handleAdd = async (fields: API.UserVO) => {
     const hide = message.loading('正在添加');
     try {
       await addUserUsingPost({
@@ -66,7 +64,6 @@ const TableList: React.FC = () => {
       hide();
       message.success('创建成功');
       handleModalVisible(false);
-      actionRef.current?.reload();
       return true;
     } catch (error: any) {
       hide();
@@ -75,7 +72,7 @@ const TableList: React.FC = () => {
     }
   };
 
-  const handleUpdate = async (fields: API.UserVO) => {
+  const handleUpdate = async (fields: API.UserUpdateRequest) => {
     if (!currentRow) {
       return;
     }
@@ -83,11 +80,10 @@ const TableList: React.FC = () => {
     try {
       await updateUserUsingPost({
         id: currentRow.id,
-        ...fields,
+        ...fields
       });
       hide();
       message.success('操作成功');
-      actionRef.current?.reload();
       return true;
     } catch (error: any) {
       hide();
@@ -96,15 +92,13 @@ const TableList: React.FC = () => {
     }
   };
 
-  const handleRemove = async (record: UserVO | UserVO[]) => {
+  const handleRemove = async (record: API.UserVO) => {
     const hide = message.loading('正在删除');
+    if (!record) return true;
     try {
-      // 判断是否为单个记录还是多个记录删除
-      if (Array.isArray(record)) {
-        await Promise.all(record.map(item => deleteUserUsingPost({id: item.id})));
-      } else {
-        await deleteUserUsingPost({ id: record.id });
-      }
+      await deleteUserUsingPost({
+        id: record.id
+      });
       hide();
       message.success('删除成功');
       actionRef.current?.reload();
@@ -117,7 +111,8 @@ const TableList: React.FC = () => {
   };
 
   const intl = useIntl();
-  const columns: ProColumns<UserVO>[] = [
+
+  const tableColumns: ProColumns<UserVO>[] = [
     {
       title: 'ID',
       dataIndex: 'id',
@@ -136,7 +131,7 @@ const TableList: React.FC = () => {
       dataIndex: 'avatarUrl',
       render: (_, record) => (
         <div>
-          <Image src={record.userAvatar} width={100} />
+          <Image src={record.userAvatar || ''} width={100} />
         </div>
       ),
     },
@@ -182,12 +177,43 @@ const TableList: React.FC = () => {
     },
   ];
 
+  const modalColumns: ProColumns<UserVO>[] = [
+    {
+      title: 'ID',
+      dataIndex: 'id',
+      valueType: 'text',
+      formItemProps: {
+        rules: [{ required: true }],
+      },
+    },
+    {
+      title: '用户名',
+      dataIndex: 'userName',
+      valueType: 'text',
+    },
+    {
+      title: '权限',
+      dataIndex: 'userRole',
+      valueType: 'text',
+    },
+    {
+      title: '简介',
+      dataIndex: 'userProfile',
+      valueType: 'text',
+    },
+    {
+      title: '创建时间',
+      dataIndex: 'createTime',
+      valueType: 'dateTime',
+    },
+  ];
+
   return (
     <PageContainer>
-      <ProTable<UserVO, API.PageParams>
+      <ProTable<UserVO>
         headerTitle={intl.formatMessage({
           id: 'pages.searchTable.title',
-          defaultMessage: '查询表格',
+          defaultMessage: 'Enquiry form',
         })}
         actionRef={actionRef}
         rowKey="id"
@@ -196,30 +222,30 @@ const TableList: React.FC = () => {
         }}
         toolBarRender={() => [
           <Button
-            key="primary"
             type="primary"
+            key="primary"
             onClick={() => {
               handleModalVisible(true);
             }}
           >
-            <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="新建" />
+            <PlusOutlined/> <FormattedMessage id="pages.searchTable.new" defaultMessage="New"/>
           </Button>,
         ]}
         dataSource={dataSource}
-        columns={columns}
+        columns={tableColumns}
         rowSelection={{
           onChange: (_, selectedRows) => {
             setSelectedRows(selectedRows);
           },
         }}
       />
-      {selectedRowsState.length > 0 && (
+      {selectedRowsState?.length > 0 && (
         <FooterToolbar
           extra={
             <div>
-              <FormattedMessage id="pages.searchTable.chosen" defaultMessage="已选择" />{' '}
-              <a style={{ fontWeight: 600 }}>{selectedRowsState.length}</a>{' '}
-              <FormattedMessage id="pages.searchTable.item" defaultMessage="项" />
+              <FormattedMessage id="pages.searchTable.chosen" defaultMessage="Chosen"/>{' '}
+              <a style={{fontWeight: 600}}>{selectedRowsState.length}</a>{' '}
+              <FormattedMessage id="pages.searchTable.item" defaultMessage="项"/>
             </div>
           }
         >
@@ -230,11 +256,21 @@ const TableList: React.FC = () => {
               actionRef.current?.reloadAndRest?.();
             }}
           >
-            <FormattedMessage id="pages.searchTable.batchDeletion" defaultMessage="批量删除" />
+            <FormattedMessage
+              id="pages.searchTable.batchDeletion"
+              defaultMessage="Batch deletion"
+            />
+          </Button>
+          <Button type="primary">
+            <FormattedMessage
+              id="pages.searchTable.batchApproval"
+              defaultMessage="Batch approval"
+            />
           </Button>
         </FooterToolbar>
       )}
       <CreateModal
+        columns={modalColumns}
         onCancel={() => {
           handleModalVisible(false);
         }}
@@ -244,40 +280,46 @@ const TableList: React.FC = () => {
         visible={createModalVisible}
       />
       <UpdateModal
-        onSubmit={async (values) => {
-          const success = await handleUpdate(values);
+        columns={modalColumns}
+        onSubmit={async (value) => {
+          const success = await handleUpdate(value);
           if (success) {
             handleUpdateModalVisible(false);
             setCurrentRow(undefined);
+            if (actionRef.current) {
+              actionRef.current?.reload();
+            }
           }
         }}
         onCancel={() => {
           handleUpdateModalVisible(false);
-          setCurrentRow(undefined);
+          if (!showDetail) {
+            setCurrentRow(undefined);
+          }
         }}
         visible={updateModalVisible}
-        values={currentRow}
+        values={currentRow || {}}
       />
       <Drawer
         width={600}
-        visible={showDetail}
+        open={showDetail}
         onClose={() => {
           setCurrentRow(undefined);
           setShowDetail(false);
         }}
         closable={false}
       >
-        {currentRow && (
+        {currentRow?.name && (
           <ProDescriptions<UserVO>
             column={2}
-            title={currentRow.userName}
+            title={currentRow?.name}
             request={async () => ({
               data: currentRow || {},
             })}
             params={{
-              id: currentRow?.id,
+              id: currentRow?.name,
             }}
-            columns={columns as ProDescriptionsItemProps<UserVO>[]}
+            columns={tableColumns as ProDescriptionsItemProps<UserVO>[]}
           />
         )}
       </Drawer>

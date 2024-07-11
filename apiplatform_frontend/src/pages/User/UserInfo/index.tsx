@@ -292,17 +292,20 @@ const Login: React.FC = () => {
                 </p>
                 <p><strong>性别: </strong>
                   {editable ? (
-                    <input
+                    <select
                       className="edit-input"
-                      type="text"
                       name="sex"
                       value={editedData.sex}
                       onChange={handleChange}
-                    />
+                    >
+                      <option value="男">男</option>
+                      <option value="女">女</option>
+                    </select>
                   ) : (
                     <span>{editedData.sex}</span>
                   )}
                 </p>
+
                 <p><strong>电话号码: </strong>
                   {editable ? (
                     <input
