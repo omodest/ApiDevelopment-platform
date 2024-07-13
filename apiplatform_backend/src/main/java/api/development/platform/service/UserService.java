@@ -122,4 +122,19 @@ public interface UserService extends IService<User> {
      */
     boolean updateSignature(User user);
 
+    /**
+     * 简单用户签到
+     * @return
+     */
+    boolean doCurrentDaySign(HttpServletRequest httpServletRequest);
+
+    /**
+     * 获取到当天 连续签到的天数
+     * @param httpServletRequest
+     * @return
+     */
+    Integer getConstantSignDay(HttpServletRequest httpServletRequest);
+
+
+
 }

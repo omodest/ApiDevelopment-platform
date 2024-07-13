@@ -3,8 +3,10 @@ package api.development.platform.service.impl;
 import static api.development.platform.constant.UserConstant.USER_LOGIN_STATE;
 
 import api.development.apiplatform_interface.model.entity.User;
+import api.development.platform.config.RedisTemplateConfig;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.RandomUtil;
+import com.alibaba.excel.metadata.data.DataFormatData;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import api.development.platform.common.ErrorCode;
@@ -17,14 +19,20 @@ import api.development.platform.model.vo.LoginUserVO;
 import api.development.platform.model.vo.UserVO;
 import api.development.platform.service.UserService;
 import api.development.platform.utils.SqlUtils;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.redis.connection.BitFieldSubCommands;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
@@ -39,6 +47,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * 盐值，混淆密码
      */
     public static final String SALT = "qwdfvbjkop";
+
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Override
     public long userRegister(String userAccount, String userPassword, String checkPassword) {
@@ -291,5 +302,74 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException(ErrorCode.OPERATION_ERROR,"保存失败");
         }
         return true;
+    }
+
+    @Override
+    public boolean doCurrentDaySign(HttpServletRequest httpServletRequest) {
+        // 1. 验证当前用户
+        User loginUser = getLoginUser(httpServletRequest);
+        Long loginUserId = loginUser.getId();
+        if (loginUser == null || loginUserId <= 0){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"登录状态异常");
+        }
+        // 2. 获取当天日期 年+月 的格式
+        LocalDateTime now = LocalDateTime.now();
+        String nowFormat = now.format(DateTimeFormatter.ofPattern("yyyyMM"));
+        // 3. 使用用户唯一标识 + 当前日期，作为存redis 时的唯一标识
+        String key = "sign-" + loginUserId + "-" + nowFormat;
+        // 4. 获取今天是本月第几天，好用来实现签到功能
+        int dayOfMonth = now.getDayOfMonth();
+        // 5. 写redis操作
+        Boolean result = redisTemplate.opsForValue().setBit(key, dayOfMonth - 1, true);
+        if (result){
+            throw new BusinessException(ErrorCode.OPERATION_ERROR,"签到失败");
+        }
+        return true;
+    }
+
+    @Override
+    public Integer getConstantSignDay(HttpServletRequest httpServletRequest) {
+        // 1. 验证当前用户
+        User loginUser = getLoginUser(httpServletRequest);
+        Long loginUserId = loginUser.getId();
+        if (loginUser == null || loginUserId <= 0){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"登录状态异常");
+        }
+        // 2. 获取当天日期 年+月 的格式
+        LocalDateTime now = LocalDateTime.now();
+        String nowFormat = now.format(DateTimeFormatter.ofPattern("yyyyMM"));
+        // 3. 使用用户唯一标识 + 当前日期，作为存redis 时的唯一标识
+        String key = "sign-" + loginUserId + "-" + nowFormat;
+        // 4. 获取今天是本月第几天，好用来实现查询
+        int dayOfMonth = now.getDayOfMonth();
+
+        // 5.获取本月截止今天为止的所有的签到记录，返回的是一个十进制的数字 BITFIELD sign:5:202403 GET U14 0
+        List<Long> result = redisTemplate.opsForValue().bitField(
+                key,
+                BitFieldSubCommands.create()
+                        .get(BitFieldSubCommands.BitFieldType.unsigned(dayOfMonth)).valueAt(0)
+        );
+        if (result == null || result.isEmpty()){
+            return 0;
+        }
+        Long num = result.get(0);
+        if (num == 0 || num == null){
+            return 0;
+        }
+
+        // 6. 循环遍历
+        int count = 0;
+        while (true){
+            // 任何数a 与 1 做与运输，结果都是a，所以这里用来判断当天是否签到
+            if ( (num & 1) == 0){
+                break;
+            }else {
+                // 签到天数统计
+                count++;
+            }
+            // 右移，表示查找前上一天
+            num >>>= 1;
+        }
+        return count;
     }
 }

@@ -332,4 +332,16 @@ public class UserController {
         return ResultUtils.success(result);
 
     }
+
+    @PostMapping("/doSign")
+    public BaseResponse<Boolean> doSign(HttpServletRequest httpServletRequest){
+        boolean done = userService.doCurrentDaySign(httpServletRequest);
+        return ResultUtils.success(done);
+    }
+
+    @GetMapping("/get/totalSign")
+    public BaseResponse getSignNum(HttpServletRequest httpServletRequest){
+        Integer constantSignDay = userService.getConstantSignDay(httpServletRequest);
+        return ResultUtils.success(constantSignDay);
+    }
 }
