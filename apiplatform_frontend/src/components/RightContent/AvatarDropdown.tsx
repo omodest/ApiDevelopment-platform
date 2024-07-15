@@ -42,7 +42,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
   const { styles } = useStyles();
 
   const { initialState, setInitialState } = useModel('@@initialState');
-
+  // 下拉框跳转
   const onMenuClick = useCallback(
     (event: MenuInfo) => {
       const { key } = event;
@@ -59,7 +59,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
       else if(key === 'center'){
         history.replace('/user/UserInfo')
       }else if(key === 'settings'){
-
+        history.replace('/user/GetCoin')
       }
       },
       [setInitialState],

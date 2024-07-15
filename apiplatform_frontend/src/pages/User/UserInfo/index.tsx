@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
-  getLoginUserUsingGet,
+  doSignUsingPost,
+  getLoginUserUsingGet, getSignNumUsingGet,
   updateAsKeyUsingGet
 } from '@/services/apiplateform-backend/userController';
 import {Card, Spin, Button, message, Upload, UploadFile, Modal, Descriptions, UploadProps} from 'antd';
@@ -33,6 +34,8 @@ const Login: React.FC = () => {
     userProfile: '',
     userAvatar: ''
   });
+  const [numSign, setNumSign] = useState<number>(0); // 签到天数
+  const [kunCoin, setKunCoin] = useState<number>(0); // 签到天数
   // 页面加载执行的钩子
   useEffect(() => {
     const fetchData = async () => {
@@ -62,6 +65,10 @@ const Login: React.FC = () => {
           userProfile: result?.data.userProfile || ''
         });
         setLoading(false); // 请求成功后设置loading为false
+        // 初始化当前连续签到天数
+        const signResult = await getSignNumUsingGet();
+        setNumSign(signResult.data);
+        setKunCoin(result.data.kunCoin)
       } catch (error) {
         console.error('Error fetching data:', error);
         setLoading(false); // 请求失败也要设置loading为false
@@ -193,6 +200,15 @@ const Login: React.FC = () => {
     return true;
   };
 
+  // 签到
+  const doSign = async() => {
+    const res = await doSignUsingPost(); // 不使用await就会拿到一个promise对象，注意需要加上await
+    if (res.code === 0){
+      message.success("签到成功");
+    }else {
+      message.error("你今天已经签到了哦");
+    }
+  }
 
   const props: UploadProps = {
     name: 'file',
@@ -332,7 +348,7 @@ const Login: React.FC = () => {
                     <span>{editedData.qq}</span>
                   )}
                 </p>
-                <p><strong>坤币: </strong>{data.data.kunCoin}</p>
+                <p><strong>坤币: </strong>{kunCoin}</p>
                 <p><strong>个人简介: </strong>
                   {editable ? (
                     <textarea
@@ -374,12 +390,12 @@ const Login: React.FC = () => {
             <div >
               <Button type="primary" onClick={updateASKey} disabled={isUpdating}>
                 {isUpdating ? '正在更新...' : '点我更换签名和密钥'}
-              </Button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              <Button type="primary">点我去充值</Button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              <Button type="primary" onClick={handleGoBack}>点我回主页</Button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              <Button type="primary">查看我的订单</Button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              <Button type="primary">邀请好友</Button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              <Button type="primary">签到</Button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              </Button> : 点击这个用来更新你访问接口的唯一标识<br/><br/>
+              {/*<Button type="primary">点我去充值</Button><br/><br/>*/}
+              <Button type="primary" onClick={handleGoBack}>返回</Button> : 点我回主页<br/><br/>
+              {/*<Button type="primary">查看我的订单</Button><br/><br/>*/}
+              {/*<Button type="primary">邀请好友</Button><br/><br/>*/}
+              <Button type="primary" onClick={doSign}>签到</Button> : 截至目前为止你已经连续签到 {numSign}天<br/><br/>
             </div>
 
           </Card>

@@ -1,4 +1,10 @@
 declare namespace API {
+  type BaseResponse = {
+    code?: number;
+    data?: Record<string, any>;
+    message?: string;
+  };
+
   type BaseResponseBoolean_ = {
     code?: number;
     data?: boolean;
@@ -68,6 +74,12 @@ declare namespace API {
   type BaseResponsePagePostVO_ = {
     code?: number;
     data?: PagePostVO_;
+    message?: string;
+  };
+
+  type BaseResponsePageProductInfo_ = {
+    code?: number;
+    data?: PageProductInfo_;
     message?: string;
   };
 
@@ -255,6 +267,18 @@ declare namespace API {
     userId?: number;
   };
 
+  type listProductInfoByPageUsingGETParams = {
+    addPoints?: number;
+    current?: number;
+    description?: string;
+    name?: string;
+    pageSize?: number;
+    productType?: string;
+    sortField?: string;
+    sortOrder?: string;
+    total?: number;
+  };
+
   type listUserInterfaceInfoByPageUsingGET1Params = {
     current?: number;
     id?: number;
@@ -335,6 +359,19 @@ declare namespace API {
     orders?: OrderItem[];
     pages?: number;
     records?: PostVO[];
+    searchCount?: boolean;
+    size?: number;
+    total?: number;
+  };
+
+  type PageProductInfo_ = {
+    countId?: string;
+    current?: number;
+    maxLimit?: number;
+    optimizeCountSql?: boolean;
+    orders?: OrderItem[];
+    pages?: number;
+    records?: ProductInfo[];
     searchCount?: boolean;
     size?: number;
     total?: number;
@@ -457,6 +494,21 @@ declare namespace API {
     title?: string;
     updateTime?: string;
     user?: UserVO;
+    userId?: number;
+  };
+
+  type ProductInfo = {
+    addPoints?: number;
+    createTime?: string;
+    description?: string;
+    expirationTime?: string;
+    id?: number;
+    isDelete?: number;
+    name?: string;
+    productType?: string;
+    status?: number;
+    total?: number;
+    updateTime?: string;
     userId?: number;
   };
 

@@ -324,9 +324,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (result){
             throw new BusinessException(ErrorCode.OPERATION_ERROR,"签到失败");
         }
+        // 6. 签到得积分
+        loginUser.setKunCoin(loginUser.getKunCoin() + 10);
+        updateById(loginUser);
         return true;
     }
 
+    // todo 这里可以添加连续多少多少天签到，获得奖励，这个比较简单就不实现了
     @Override
     public Integer getConstantSignDay(HttpServletRequest httpServletRequest) {
         // 1. 验证当前用户

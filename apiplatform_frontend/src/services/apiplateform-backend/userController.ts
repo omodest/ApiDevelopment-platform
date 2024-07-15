@@ -29,6 +29,14 @@ export async function deleteUserUsingPost(
   });
 }
 
+/** doSign POST /api/user/doSign */
+export async function doSignUsingPost(options?: { [key: string]: any }) {
+  return request<API.BaseResponseBoolean_>('/api/user/doSign', {
+    method: 'POST',
+    ...(options || {}),
+  });
+}
+
 /** getUserById GET /api/user/get */
 export async function getUserByIdUsingGet(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
@@ -47,6 +55,14 @@ export async function getUserByIdUsingGet(
 /** getLoginUser GET /api/user/get/login */
 export async function getLoginUserUsingGet(options?: { [key: string]: any }) {
   return request<API.BaseResponseLoginUserVO_>('/api/user/get/login', {
+    method: 'GET',
+    ...(options || {}),
+  });
+}
+
+/** getSignNum GET /api/user/get/totalSign */
+export async function getSignNumUsingGet(options?: { [key: string]: any }) {
+  return request<API.BaseResponse>('/api/user/get/totalSign', {
     method: 'GET',
     ...(options || {}),
   });

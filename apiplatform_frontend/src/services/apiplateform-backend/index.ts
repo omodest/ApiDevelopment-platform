@@ -5,6 +5,7 @@
 import * as analysisController from './analysisController';
 import * as fileController from './fileController';
 import * as interfaceInfoController from './interfaceInfoController';
+import * as orderController from './orderController';
 import * as postController from './postController';
 import * as postFavourController from './postFavourController';
 import * as postThumbController from './postThumbController';
@@ -19,6 +20,7 @@ export default {
   postController,
   postFavourController,
   postThumbController,
+  orderController,
   userController,
   userInterfaceInfoController,
 };
