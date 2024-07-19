@@ -3,10 +3,12 @@ package api.development.platform.service.impl;
 import static api.development.platform.constant.UserConstant.USER_LOGIN_STATE;
 
 import api.development.apiplatform_interface.model.entity.User;
-import api.development.platform.config.RedisTemplateConfig;
+//import api.development.platform.config.RedisTemplateConfig;
+//import api.development.platform.model.dto.user.SmsDTO;
+//import api.development.platform.utils.SmsUtils;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.RandomUtil;
-import com.alibaba.excel.metadata.data.DataFormatData;
+//import com.alibaba.excel.metadata.data.DataFormatData;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import api.development.platform.common.ErrorCode;
@@ -24,12 +26,15 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+//import java.util.regex.Matcher;
+//import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import org.apache.commons.lang3.StringUtils;
+//import org.apache.xmlbeans.impl.regex.Match;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.connection.BitFieldSubCommands;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -50,6 +55,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
+
+//    @Resource
+//    private SmsUtils smsUtils;
 
     @Override
     public long userRegister(String userAccount, String userPassword, String checkPassword) {
@@ -376,4 +384,27 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         return count;
     }
+
+//    @Override
+//    public Boolean sendSmsCaptcha(String phoneNum) {
+//
+//        if (StringUtils.isEmpty(phoneNum)) {
+//            throw new BusinessException(ErrorCode.PARAMS_ERROR, "手机号不能为空");
+//        }
+//        String regex = "^(?:(?:\\+|00)86)?1[3-9]\\d{9}$\n";
+//        Pattern pattern = Pattern.compile(regex);
+//        Matcher matcher = pattern.matcher(phoneNum);
+//
+//        // 检查手机号格式是否正确
+//        if (!matcher.matches()) {
+//            throw new BusinessException(ErrorCode.PARAMS_ERROR, "手机号格式错误");
+//        }
+//
+//        //生成随机验证码
+//        int code = (int) ((Math.random() * 9 + 1) * 10000);
+//        SmsDTO smsDTO = new SmsDTO(phoneNum,String.valueOf(code));
+//
+//        return smsUtils.sendSms(smsDTO);
+//    }
+
 }

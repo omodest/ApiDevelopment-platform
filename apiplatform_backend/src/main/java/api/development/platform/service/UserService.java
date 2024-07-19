@@ -136,5 +136,13 @@ public interface UserService extends IService<User> {
     Integer getConstantSignDay(HttpServletRequest httpServletRequest);
 
 
+//    /**
+//     * 获取短信验证码
+//     * @param phoneNum
+//     * @return
+//     */
+//    Boolean sendSmsCaptcha(String phoneNum);
+
+
 
 }

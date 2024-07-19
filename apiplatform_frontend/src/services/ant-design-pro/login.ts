@@ -20,8 +20,8 @@ export async function getFakeCaptcha(
   params: API.getFakeCaptchaParams,
   options?: { [key: string]: any },
 ) {
-  return request<API.FakeCaptcha>('/api/login/captcha', {
-    method: 'POST',
+  return request<API.FakeCaptcha>('/api/user/smsCaptcha', {
+    method: 'GET',
     params: {
       ...params,
     },

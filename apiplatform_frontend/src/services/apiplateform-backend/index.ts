@@ -17,10 +17,10 @@ export default {
   analysisController,
   fileController,
   interfaceInfoController,
+  orderController,
   postController,
   postFavourController,
   postThumbController,
-  orderController,
   userController,
   userInterfaceInfoController,
 };
