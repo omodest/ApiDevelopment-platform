@@ -1,21 +1,19 @@
 import { Footer } from '@/components';
 import {
+  LockOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
+import {
   LoginForm,
   ProFormText,
 } from '@ant-design/pro-components';
-import { history, SelectLang, useIntl, Helmet } from '@umijs/max';
+import { FormattedMessage, history, SelectLang, useIntl, useModel, Helmet } from '@umijs/max';
 import { message, Tabs } from 'antd';
 import Settings from '../../../../config/defaultSettings';
 import React, { useState } from 'react';
 import { createStyles } from 'antd-style';
 import {Link} from "react-router-dom";
-import {
-  getCaptchaUsingGet,
-  userEmailRegisterUsingPost
-} from "@/services/apiplateform-backend/userController";
-import {ProFormCaptcha} from "@ant-design/pro-form";
-import {UserOutlined} from "@ant-design/icons";
-import {FormattedMessage} from "@@/exports";
+import {userRegisterUsingPost} from "@/services/apiplateform-backend/userController";
 
 const useStyles = createStyles(({ token }) => {
   return {
@@ -65,15 +63,15 @@ const Register: React.FC = () => {
   const [type, setType] = useState<string>('account');
   const { styles } = useStyles();
   const intl = useIntl();
-  const handleSubmit = async (values: API.UserEmailRegisterRequest) => {
+  const handleSubmit = async (values: API.UserRegisterRequest) => {
     try {
-      // 注册接口
-      const res = await userEmailRegisterUsingPost({ ...values});
+      // 注册
+      const res = await userRegisterUsingPost({ ...values});
       if (res.data) {
         setTimeout(() => {
           history.push('/');
         },100)
-        message.success("注册成功了,默认密码:12345678");
+        message.success("注册成功了,登录吧");
         return;
       }else {
         message.error(res.message); // 注册失败
@@ -147,7 +145,7 @@ const Register: React.FC = () => {
           {type === 'account' && (
             <>
               <ProFormText
-                name="userName"
+                name="userAccount"
                 fieldProps={{
                   size: 'large',
                   prefix: <UserOutlined />,
@@ -168,64 +166,53 @@ const Register: React.FC = () => {
                   },
                 ]}
               />
-
-              <ProFormText
+              <ProFormText.Password
+                name="userPassword"
                 fieldProps={{
                   size: 'large',
+                  prefix: <LockOutlined />,
                 }}
-                name="emailAccount"
-                placeholder={'请输入邮箱账号！'}
+                placeholder={intl.formatMessage({
+                  id: 'pages.login.password.placeholder',
+                  defaultMessage: '请输入密码！',
+                })}
                 rules={[
                   {
                     required: true,
-                    message: '邮箱账号是必填项！',
-                  },
-                  {
-                    pattern: /^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$/,
-                    message: '不合法的邮箱账号！',
+                    message: (
+                      <FormattedMessage
+                        id="pages.login.password.required"
+                        defaultMessage="请输入密码！"
+                      />
+                    ),
                   },
                 ]}
               />
-              <ProFormText
-                name="invitationCode"
+              <ProFormText.Password
+                name="checkPassword"
                 fieldProps={{
                   size: 'large',
+                  prefix: <LockOutlined />,
                 }}
-                placeholder={'请输入邀请码,没有可不填'}
-              />
-              <ProFormCaptcha
-                fieldProps={{
-                  size: 'large',
-                }}
-                captchaProps={{
-                  size: 'large',
-                }}
-                placeholder={'请输入验证码！'}
-                captchaTextRender={(timing, count) => {
-                  if (timing) {
-                    return `${count} ${'秒后重新获取'}`;
-                  }
-                  return '获取验证码';
-                }}
-                phoneName={"emailAccount"}
-                name="captcha"
+                placeholder={intl.formatMessage({
+                  id: 'pages.login.password.again',
+                  defaultMessage: '请再次输入密码！',
+                })}
                 rules={[
                   {
                     required: true,
-                    message: '验证码是必填项！',
+                    message: (
+                      <FormattedMessage
+                        id="pages.login.password.again"
+                        defaultMessage="请再次输入密码！"
+                      />
+                    ),
                   },
                 ]}
-                onGetCaptcha={async (emailAccount) => {
-                  const res = await getCaptchaUsingGet({ emailAccount });
-                  if (res.data && res.code === 0) {
-                    message.success("验证码发送成功");
-                    return;
-                  }
-                }}
               />
-
             </>
           )}
+
         </LoginForm>
       </div>
       <Footer />

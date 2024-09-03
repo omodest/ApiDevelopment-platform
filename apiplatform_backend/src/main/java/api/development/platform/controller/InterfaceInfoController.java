@@ -19,6 +19,7 @@ import api.development.platform.service.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -184,8 +185,28 @@ public class InterfaceInfoController {
         String secretKey = loginUser.getSecretKey();
         NameClient nc = new NameClient(accessKey, secretKey);
         Gson gson = new Gson();
-        api.development.apiplatform_client_sdk.model.User user1 = gson.fromJson(requestParams, api.development.apiplatform_client_sdk.model.User.class);
-        String userNameByPost = nc.getUserNameByPost(user1);
+        api.development.apiplatform_client_sdk.model.User user1 = null;
+        String userNameByPost = "";
+        try {
+            // 确保 requestParams 是一个有效的 JSON 字符串
+            if (requestParams != null && !requestParams.trim().isEmpty()) {
+                user1 = gson.fromJson(requestParams, api.development.apiplatform_client_sdk.model.User.class);
+            }
+
+            if (user1 != null) {
+                userNameByPost = nc.getUserNameByPost(user1);
+                System.out.println("UserName: " + userNameByPost);
+            } else {
+                System.out.println("User1 is null after JSON parsing.");
+            }
+        } catch (JsonSyntaxException e) {
+            // 处理 JSON 解析异常
+            System.err.println("Failed to parse JSON: " + e.getMessage());
+        } catch (Exception e) {
+            // 处理其他可能的异常
+            System.err.println("An error occurred: " + e.getMessage());
+        }
+
         return ResultUtils.success(userNameByPost);
     }
 

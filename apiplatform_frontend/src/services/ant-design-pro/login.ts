@@ -20,7 +20,7 @@ export async function getFakeCaptcha(
   params: API.getFakeCaptchaParams,
   options?: { [key: string]: any },
 ) {
-  return request<API.FakeCaptcha>('/api/user/smsCaptcha', {
+  return request<API.FakeCaptcha>('/api/user/getCaptcha', {
     method: 'GET',
     params: {
       ...params,

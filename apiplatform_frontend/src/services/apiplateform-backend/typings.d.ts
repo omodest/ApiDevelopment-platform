@@ -146,6 +146,11 @@ declare namespace API {
     id?: number;
   };
 
+  type getCaptchaUsingGETParams = {
+    /** emailAccount */
+    emailAccount?: string;
+  };
+
   type getInterfaceInfoVOByIdUsingGETParams = {
     /** id */
     id?: number;
@@ -549,6 +554,13 @@ declare namespace API {
     userRole?: string;
   };
 
+  type UserEmailRegisterRequest = {
+    captcha?: string;
+    emailAccount?: string;
+    invitationCode?: string;
+    userName?: string;
+  };
+
   type UserInterfaceInfo = {
     createTime?: string;
     id?: number;
@@ -573,11 +585,6 @@ declare namespace API {
     leftNum?: number;
     status?: number;
     totalNum?: number;
-  };
-
-  type userLoginByWxOpenUsingGETParams = {
-    /** code */
-    code: string;
   };
 
   type UserLoginRequest = {

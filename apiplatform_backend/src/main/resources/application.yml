@@ -29,6 +29,19 @@ spring:
     host: localhost
     port: 6379
     timeout: 5000
+  #  邮箱配置 todo 修改为自己的邮箱发送配置 password为邮箱授权码
+  mail:
+    # QQ邮箱的SMTP服务器地址
+    host: smtp.qq.com
+    username: 2500822924@qq.com
+    emailFrom: 2500822924@qq.com
+    # 邮箱授权码
+    password: wafwvxozmyoqdjbg
+    properties:
+      mail:
+        smtp:
+          ssl:
+            enable: true
   rabbitmq:
     host: 127.0.0.1
     port: 5672
@@ -91,6 +104,10 @@ wx:
 # todo 需替换配置  这里的密钥不能提交的git上，推送会失败
 cos:
   client:
+    accessKey: 1
+    secretKey: 1
+    region: 1
+    bucket: 1
 
 # 接口文档配置
 knife4j:

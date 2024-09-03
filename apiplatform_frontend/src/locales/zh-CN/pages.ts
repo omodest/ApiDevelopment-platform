@@ -10,7 +10,7 @@ export default {
   'pages.login.password.placeholder': '密码至少为八位',
   'pages.login.password.required': '密码是必填项！',
   'pages.login.password.again': '请再次输入密码',
-  'pages.login.phoneLogin.tab': '手机号登录',
+  'pages.login.phoneLogin.tab': 'QQ邮箱登录',
   'pages.login.phoneLogin.errorMessage': '验证码错误',
   'pages.login.phoneNumber.placeholder': '请输入手机号！',
   'pages.login.phoneNumber.required': '手机号是必填项！',

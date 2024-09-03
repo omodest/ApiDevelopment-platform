@@ -1,45 +1,43 @@
 package api.development.platform.service.impl;
 
-import static api.development.platform.constant.UserConstant.USER_LOGIN_STATE;
-
 import api.development.apiplatform_interface.model.entity.User;
-//import api.development.platform.config.RedisTemplateConfig;
-//import api.development.platform.model.dto.user.SmsDTO;
-//import api.development.platform.utils.SmsUtils;
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.RandomUtil;
-//import com.alibaba.excel.metadata.data.DataFormatData;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import api.development.platform.common.ErrorCode;
 import api.development.platform.constant.CommonConstant;
 import api.development.platform.exception.BusinessException;
 import api.development.platform.mapper.UserMapper;
+import api.development.platform.model.dto.user.UserEmailRegisterRequest;
 import api.development.platform.model.dto.user.UserQueryRequest;
 import api.development.platform.model.enums.UserRoleEnum;
 import api.development.platform.model.vo.LoginUserVO;
 import api.development.platform.model.vo.UserVO;
 import api.development.platform.service.UserService;
+import api.development.platform.utils.RedissonLockUtils;
 import api.development.platform.utils.SqlUtils;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-//import java.util.regex.Matcher;
-//import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.RandomUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import org.apache.commons.lang3.StringUtils;
-//import org.apache.xmlbeans.impl.regex.Match;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.connection.BitFieldSubCommands;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import static api.development.platform.constant.EmailConstant.CAPTCHA_CACHE_KEY;
+import static api.development.platform.constant.UserConstant.USER_LOGIN_STATE;
 
 /**
  * 用户服务实现
@@ -53,11 +51,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     public static final String SALT = "qwdfvbjkop";
 
+    /**
+     * 使用声明的redisTemplate 可以直接便捷操作redis数据库
+     */
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
-//    @Resource
-//    private SmsUtils smsUtils;
+    /**
+     * 自定义分布式锁 工具类
+     */
+    @Resource
+    private RedissonLockUtils redissonLockUtils;
+
+    @Resource
+    private UserMapper userMapper;
 
     @Override
     public long userRegister(String userAccount, String userPassword, String checkPassword) {
@@ -338,7 +345,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return true;
     }
 
-    // todo 这里可以添加连续多少多少天签到，获得奖励，这个比较简单就不实现了
+    //  这里可以添加连续多少多少天签到，获得奖励，这个比较简单就不实现了
     @Override
     public Integer getConstantSignDay(HttpServletRequest httpServletRequest) {
         // 1. 验证当前用户
@@ -385,26 +392,58 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return count;
     }
 
-//    @Override
-//    public Boolean sendSmsCaptcha(String phoneNum) {
-//
-//        if (StringUtils.isEmpty(phoneNum)) {
-//            throw new BusinessException(ErrorCode.PARAMS_ERROR, "手机号不能为空");
-//        }
-//        String regex = "^(?:(?:\\+|00)86)?1[3-9]\\d{9}$\n";
-//        Pattern pattern = Pattern.compile(regex);
-//        Matcher matcher = pattern.matcher(phoneNum);
-//
-//        // 检查手机号格式是否正确
-//        if (!matcher.matches()) {
-//            throw new BusinessException(ErrorCode.PARAMS_ERROR, "手机号格式错误");
-//        }
-//
-//        //生成随机验证码
-//        int code = (int) ((Math.random() * 9 + 1) * 10000);
-//        SmsDTO smsDTO = new SmsDTO(phoneNum,String.valueOf(code));
-//
-//        return smsUtils.sendSms(smsDTO);
-//    }
+    @Override
+    public Long userEmailRegister(UserEmailRegisterRequest userEmailRegisterRequest) {
+        String emailAccount = userEmailRegisterRequest.getEmailAccount();
+        String captcha = userEmailRegisterRequest.getCaptcha();
+        String userName = userEmailRegisterRequest.getUserName();
+        // 1. 参数校验
+        if (StringUtils.isAnyBlank(emailAccount, captcha)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        if (userName.length() > 40) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "昵称过长");
+        }
+        String emailPattern = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        if (!Pattern.matches(emailPattern, emailAccount)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "不合法的邮箱地址！");
+        }
+        String cacheCaptcha = (String) redisTemplate.opsForValue().get(CAPTCHA_CACHE_KEY + emailAccount);
+        if (StringUtils.isBlank(cacheCaptcha)) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "验证码已过期,请重新获取");
+        }
+        captcha = captcha.trim();
+        if (!cacheCaptcha.equals(captcha)) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "验证码输入有误");
+        }
+        // 2， 分布式锁操作
+        String redissonLock = ("userEmailRegister_" + emailAccount).intern();
+        return redissonLockUtils.redissonDistributedLocks(redissonLock, () -> {
+            // 账户不能重复
+            QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("userAccount", emailAccount);
+            long count = userMapper.selectCount(queryWrapper);
+            if (count > 0) {
+                throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号重复");
+            }
+            // ak/sk 先使用emailAccount 代替 userAccount
+            String accessKey = Arrays.toString(DigestUtils.md5Digest((SALT + emailAccount + RandomUtil.randomNumbers(5)).getBytes()));
+            String secretKey = Arrays.toString(DigestUtils.md5Digest((SALT + emailAccount + RandomUtil.randomNumbers(5)).getBytes()));
+            // 3. 插入数据
+            User user = new User();
+            user.setUserAccount(emailAccount);
+            user.setUserName(userName);
+            user.setAccessKey(accessKey);
+            user.setUserPassword("9a7de855252761cb5efc00ea75be3780");
+            user.setQq(emailAccount);
+            user.setSecretKey(secretKey);
+            boolean saveResult = this.save(user);
+            if (!saveResult) {
+                throw new BusinessException(ErrorCode.SYSTEM_ERROR, "注册失败，数据库错误");
+            }
+            return user.getId();
+        }, "邮箱账号注册失败");
+    }
+
 
 }

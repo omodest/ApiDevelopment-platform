@@ -34,10 +34,15 @@ export default [
         component: './User/Login',
       },
       {
-        name: '注册',
+        name: '邮箱注册',
         path: '/user/register',
         component: './User/Register',
       },
+      // {
+      //   name: '注册',
+      //   path: '/user/register',
+      //   component: './User/Register(old)',
+      // },
       {
         name: '个人信息',
         path: '/user/userInfo',

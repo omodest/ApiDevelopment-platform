@@ -1,6 +1,7 @@
 package api.development.platform.service;
 
 import api.development.apiplatform_interface.model.entity.User;
+import api.development.platform.model.dto.user.UserEmailRegisterRequest;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import api.development.platform.model.dto.user.UserQueryRequest;
@@ -136,12 +137,10 @@ public interface UserService extends IService<User> {
     Integer getConstantSignDay(HttpServletRequest httpServletRequest);
 
 
-//    /**
-//     * 获取短信验证码
-//     * @param phoneNum
-//     * @return
-//     */
-//    Boolean sendSmsCaptcha(String phoneNum);
+    /**
+     * 获取短信验证码
+     */
+    Long userEmailRegister(UserEmailRegisterRequest userEmailRegisterRequest);
 
 
 

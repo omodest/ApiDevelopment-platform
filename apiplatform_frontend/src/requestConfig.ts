@@ -8,7 +8,6 @@ interface ResponseStructure {
   data: any;
   errorCode?: number;
   errorMessage?: string;
-  showType?: ErrorShowType;
 }
 
 /**

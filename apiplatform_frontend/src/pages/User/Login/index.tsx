@@ -188,13 +188,13 @@ const Login: React.FC = () => {
                   defaultMessage: '账户密码登录',
                 }),
               },
-              {
-                key: 'mobile',
-                label: intl.formatMessage({
-                  id: 'pages.login.phoneLogin.tab',
-                  defaultMessage: '手机号登录',
-                }),
-              },
+              // {
+              //   key: 'mobile',
+              //   label: intl.formatMessage({
+              //     id: 'pages.login.phoneLogin.tab',
+              //     defaultMessage: 'QQ邮箱登录',
+              //   }),
+              // },
             ]}
           />
 
@@ -247,88 +247,88 @@ const Login: React.FC = () => {
             </>
           )}
 
-          {status === 'error' && loginType === 'mobile' && <LoginMessage content="验证码错误" />}
-          {type === 'mobile' && (
-            <>
-              <ProFormText
-                fieldProps={{
-                  size: 'large',
-                  prefix: <MobileOutlined />,
-                }}
-                name="mobile"
-                placeholder={intl.formatMessage({
-                  id: 'pages.login.phoneNumber.placeholder',
-                  defaultMessage: '手机号',
-                })}
-                rules={[
-                  {
-                    required: true,
-                    message: (
-                      <FormattedMessage
-                        id="pages.login.phoneNumber.required"
-                        defaultMessage="请输入手机号！"
-                      />
-                    ),
-                  },
-                  {
-                    pattern: /^1\d{10}$/,
-                    message: (
-                      <FormattedMessage
-                        id="pages.login.phoneNumber.invalid"
-                        defaultMessage="手机号格式错误！"
-                      />
-                    ),
-                  },
-                ]}
-              />
-              <ProFormCaptcha
-                fieldProps={{
-                  size: 'large',
-                  prefix: <LockOutlined />,
-                }}
-                captchaProps={{
-                  size: 'large',
-                }}
-                placeholder={intl.formatMessage({
-                  id: 'pages.login.captcha.placeholder',
-                  defaultMessage: '请输入验证码',
-                })}
-                captchaTextRender={(timing, count) => {
-                  if (timing) {
-                    return `${count} ${intl.formatMessage({
-                      id: 'pages.getCaptchaSecondText',
-                      defaultMessage: '获取验证码',
-                    })}`;
-                  }
-                  return intl.formatMessage({
-                    id: 'pages.login.phoneLogin.getVerificationCode',
-                    defaultMessage: '获取验证码',
-                  });
-                }}
-                name="captcha"
-                rules={[
-                  {
-                    required: true,
-                    message: (
-                      <FormattedMessage
-                        id="pages.login.captcha.required"
-                        defaultMessage="请输入验证码！"
-                      />
-                    ),
-                  },
-                ]}
-                onGetCaptcha={async (phone) => {
-                  const result = await getFakeCaptcha({
-                    phone,
-                  });
-                  if (!result) {
-                    return;
-                  }
-                  message.success('获取验证码成功！验证码为：1234');
-                }}
-              />
-            </>
-          )}
+          {/*{status === 'error' && loginType === 'mobile' && <LoginMessage content="验证码错误" />}*/}
+          {/*{type === 'mobile' && (*/}
+          {/*  <>*/}
+          {/*    <ProFormText*/}
+          {/*      fieldProps={{*/}
+          {/*        size: 'large',*/}
+          {/*        prefix: <MobileOutlined />,*/}
+          {/*      }}*/}
+          {/*      name="mobile"*/}
+          {/*      placeholder={intl.formatMessage({*/}
+          {/*        id: 'pages.login.phoneNumber.placeholder',*/}
+          {/*        defaultMessage: 'QQ邮箱',*/}
+          {/*      })}*/}
+          {/*      rules={[*/}
+          {/*        {*/}
+          {/*          required: true,*/}
+          {/*          message: (*/}
+          {/*            <FormattedMessage*/}
+          {/*              id="pages.login.phoneNumber.required"*/}
+          {/*              defaultMessage="请输入QQ邮箱！"*/}
+          {/*            />*/}
+          {/*          ),*/}
+          {/*        },*/}
+          {/*        {*/}
+          {/*          pattern: /^[1-9][0-9]{4,14}@qq\.com$/,*/}
+          {/*          message: (*/}
+          {/*            <FormattedMessage*/}
+          {/*              id="pages.login.phoneNumber.invalid"*/}
+          {/*              defaultMessage="QQ邮箱格式错误！"*/}
+          {/*            />*/}
+          {/*          ),*/}
+          {/*        },*/}
+          {/*      ]}*/}
+          {/*    />*/}
+          {/*    <ProFormCaptcha*/}
+          {/*      fieldProps={{*/}
+          {/*        size: 'large',*/}
+          {/*        prefix: <LockOutlined />,*/}
+          {/*      }}*/}
+          {/*      captchaProps={{*/}
+          {/*        size: 'large',*/}
+          {/*      }}*/}
+          {/*      placeholder={intl.formatMessage({*/}
+          {/*        id: 'pages.login.captcha.placeholder',*/}
+          {/*        defaultMessage: '请输入验证码',*/}
+          {/*      })}*/}
+          {/*      captchaTextRender={(timing, count) => {*/}
+          {/*        if (timing) {*/}
+          {/*          return `${count} ${intl.formatMessage({*/}
+          {/*            id: 'pages.getCaptchaSecondText',*/}
+          {/*            defaultMessage: '获取验证码',*/}
+          {/*          })}`;*/}
+          {/*        }*/}
+          {/*        return intl.formatMessage({*/}
+          {/*          id: 'pages.login.phoneLogin.getVerificationCode',*/}
+          {/*          defaultMessage: '获取验证码',*/}
+          {/*        });*/}
+          {/*      }}*/}
+          {/*      name="captcha"*/}
+          {/*      rules={[*/}
+          {/*        {*/}
+          {/*          required: true,*/}
+          {/*          message: (*/}
+          {/*            <FormattedMessage*/}
+          {/*              id="pages.login.captcha.required"*/}
+          {/*              defaultMessage="请输入验证码！"*/}
+          {/*            />*/}
+          {/*          ),*/}
+          {/*        },*/}
+          {/*      ]}*/}
+          {/*      onGetCaptcha={async (phone) => {*/}
+          {/*        const result = await getFakeCaptcha({*/}
+          {/*          phone,*/}
+          {/*        });*/}
+          {/*        if (!result) {*/}
+          {/*          return;*/}
+          {/*        }*/}
+          {/*        message.success('获取验证码成功！注册成功后密码：12345678，记得及时修改');*/}
+          {/*      }}*/}
+          {/*    />*/}
+          {/*  </>*/}
+          {/*)}*/}
           <div
             style={{
               marginBottom: 24,

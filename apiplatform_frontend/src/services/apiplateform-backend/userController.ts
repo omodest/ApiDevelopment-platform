@@ -37,6 +37,21 @@ export async function doSignUsingPost(options?: { [key: string]: any }) {
   });
 }
 
+/** userEmailRegister POST /api/user/email/register */
+export async function userEmailRegisterUsingPost(
+  body: API.UserEmailRegisterRequest,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponseLong_>('/api/user/email/register', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** getUserById GET /api/user/get */
 export async function getUserByIdUsingGet(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
@@ -75,6 +90,21 @@ export async function getUserVoByIdUsingGet(
   options?: { [key: string]: any },
 ) {
   return request<API.BaseResponseUserVO_>('/api/user/get/vo', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
+/** getCaptcha GET /api/user/getCaptcha */
+export async function getCaptchaUsingGet(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.getCaptchaUsingGETParams,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponseBoolean_>('/api/user/getCaptcha', {
     method: 'GET',
     params: {
       ...params,
@@ -124,21 +154,6 @@ export async function userLoginUsingPost(
       'Content-Type': 'application/json',
     },
     data: body,
-    ...(options || {}),
-  });
-}
-
-/** userLoginByWxOpen GET /api/user/login/wx_open */
-export async function userLoginByWxOpenUsingGet(
-  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.userLoginByWxOpenUsingGETParams,
-  options?: { [key: string]: any },
-) {
-  return request<API.BaseResponseLoginUserVO_>('/api/user/login/wx_open', {
-    method: 'GET',
-    params: {
-      ...params,
-    },
     ...(options || {}),
   });
 }
