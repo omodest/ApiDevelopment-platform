@@ -63,6 +63,7 @@ spring:
       max-file-size: 10MB
 server:
   address: 0.0.0.0
+  # 内网映射这个端口别写错了(内网穿透后，内网穿透地址要和这里的8101端口起同样作用,内网穿透后的地址就是公网地址)
   port: 8101
   servlet:
     context-path: /api
@@ -108,6 +109,23 @@ cos:
     secretKey: 1
     region: 1
     bucket: 1
+# 沙箱支付
+alipay:
+  # 支付宝应用ID
+  appId: 9021000139623695
+  # 应用私钥
+  appPrivateKey: MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCEKStv7BWOARZBRyiT1dqRdaZm3bfg0YFbSAQfvkMeNORpuZNZ8SZAJNwuH31nfr6lgiAeBBXnncGddxHt61m+zC44O+2b2sX8h+z6U1k5fQKLZKA/tGPgJ86ASHbWerCthAKryjGGD5uVK6p2diKQ2O2Xzitutjg9kYgAuQ/V8RfkDF+MFcRfVG4NBl58q4DQA6FdC9DgwzE8mte0eaxuxGbMRd7Sv4clo3vrkJJj/SyKmH40CykuMI5ejG4a09KcSXj1RKKJVhmay89FqU/G75a9bW/6mz/W9vtYhbSerfU1IC1ld6u5F6ZXhYUKq/vaJbqYdzV+bU+p7ruwuu21AgMBAAECggEAI5ayi8EXTNYeGBYBZ03/PYxg8vJhwbipDNunwKSLjmbP22iNtXqqwjsqz4DLVENdM1SHMY4IGAbzTGP0AA2QbUCucZYxtfaDui0gM4ieTkzLkp3WSVFaU9JkWUcqOTdwvEkALyKTk3ZAfzry/FNzm23PDUIHkBihrHK0HP24tfN+kXaEdFH24qoFcDXalA7ICglCcXx8+jImhPveYcVRAvp2kdvANQqxrygjSNGkijRlK+46fCXOkyQlrcFa4QMKespJOtLki5k8/JaS19TcoRUZLEgx+wml2Cd8fpkGqxONcocwhxLhBF9gJUeqzprsHrj8ycYSgCiQDRBRcz3FQQKBgQD6srJzi5YTC3lapwdrP+RUTHInsCo/3vyJ1qs0P8Lgcll6Gj/l5cWysKC+0IT1NmvOdqWPHmzAFHHSayynpxFDNiXRWbN/wvGc22m7S48CzmSlwRpmug6l8to5OHGKWSePnkXrcRf0YtKJU+muJPCoBPucNA2xdfadP44cnQKgfwKBgQCG9LNsqDW5YjuCbFSrJPf4ZZv4eZqRX8ltvD2Sx4SfxIxwlAysUrUITaTv66BsuwQH91ofcQ9I8RbNVIUEYxRSnypTv12evDZoeIrvVEaQ42WoUfKCly8N6X09+bQAb2LDRGRPNYsAHAI0Y1mw+ZvW03c9OIE+UHwINXRe96XXywKBgQDQqm54WCX5AiLnPoGhVlPhiqO1vx7bfOnsfP6RhcTZ9rPdOv4Wh/LO8c9KI9uXEs4W0pCpGGTiV+IJh2VqwldO/0HpB+WtIQDkU4ik+ZY2er4xbRJhkNnibMoQuJdg1SZllxKRjtemdZ7R6UNmzJ5263bWJEmFfS9g4WaTEGkAVwKBgAo41q5QP2F/U0qZsgAUmMOzzpCPhWmle7hYHcHUYvNHC+wrCpqy2Qt79hZGHqydrbx8u9LN2X6I5FVBJaIjbxKjA628PPcdAnH/T2a5V276CmUpb9j8YpAHM3lSRJQT28M2lvJ498JWXMRjEhQZk/g9pDZ65S83IW3tvpbC40jpAoGBALUcRXnI555m164j0qykNOCRR1MlrIES9+H2mRvWtfENxTJR8kQUtEh3eA3gFO9tJNp1Q6KKMJezNc674T7NT4+62jstVJ2KimSuy5oOu//OmqEE+WungvviMqZ4d7Dd317vJMlzQK7os6OgzLo0w6R235NtltUhyDF+TmVI3NCW
+  # 应用公钥
+  alipayPublicKey: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhTpxbsOSccQAV3aqtfy41SrAD3F49+HE0lJ5U0W3SBJDrn/ID/FsQy+wVNJEdoQbnGMb8Egc73grDHnOEXstppZOsar5qyZ9uyvy9QIIuqpsWVJEOuqaUYtmZpJ/0hU2ZXRC9Vz+9UwJZA55Cs91fQsxjiMGHJrXyFRwim3e975mkskm1R0KBMQBB+d1CUQKaeVzFTnFnLZqqt4HSpTWNM9O8dkpDRrkw6D9TNT8/GD+YC9DzglnOdZWDqP3Ae1a/ss7TXkLqgKBoijB1Rs7wl5kkkcfe1j11bn3QlBH10mpC8QCcFNwy/6BIrmZ1jK6YfOCzrVWN+F2+o9h4cHdmwIDAQAB
+  # 支付宝支付回调通知的地址 （这是我们后端自己提供的接口，由于需要使用公网地址这里就不使用8081，使用内网穿透地址；注意：内网穿透地址每次启动都会改变）
+  notifyUrl:  http://br44b5.natappfree.ccALIPAY/api/order/notify/order
+  # 支付完成后的回调地址 (前端地址)
+  returnUrl: http://localhost:8001/user/GetCoin
+  signType: RSA2
+  charset: utf-8
+  # 支付宝网关地址
+  gatewayUrl: https://openapi-sandbox.dl.alipaydev.com/gateway.do
+
 
 # 接口文档配置
 knife4j:

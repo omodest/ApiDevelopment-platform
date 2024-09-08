@@ -32,7 +32,9 @@ const Login: React.FC = () => {
     telephone: '',
     qq: '',
     userProfile: '',
-    userAvatar: ''
+    userAvatar: '',
+    accessKey: '',
+    secretKey: ''
   });
   const [numSign, setNumSign] = useState<number>(0); // 签到天数
   const [kunCoin, setKunCoin] = useState<number>(0); // 签到天数
@@ -62,7 +64,9 @@ const Login: React.FC = () => {
           sex: result?.data.sex || '',
           telephone: result?.data.telephone || '',
           qq: result?.data.qq || '',
-          userProfile: result?.data.userProfile || ''
+          userProfile: result?.data.userProfile || '',
+          accessKey: result?.data.accessKey || '',
+          secretKey: result?.data.secretKey || ''
         });
         setLoading(false); // 请求成功后设置loading为false
         // 初始化当前连续签到天数
@@ -94,7 +98,8 @@ const Login: React.FC = () => {
 
   // 修改签名
   const updateASKey = async () => {
-    if (isUpdating) return; // 如果正在更新，直接返回，不执行下面的代码
+    if (isUpdating)
+      return; // 如果正在更新，直接返回，不执行下面的代码
     setIsUpdating(true); // 设置为正在更新状态
     try {
       await updateAsKeyUsingGet();
@@ -217,7 +222,8 @@ const Login: React.FC = () => {
     onChange: async ({ file, fileList: newFileList }) => {
       const { response } = file;
       if (response && response.data) {
-        const { status, url } = response.data;
+        // const { status, url } = response.data;
+        const { status } = response.data;
         const updatedFileList = [...fileList];
         if (response.code !== 0 || status === 'error') {
           message.error(response.message);
@@ -314,6 +320,7 @@ const Login: React.FC = () => {
                       value={editedData.sex}
                       onChange={handleChange}
                     >
+                      <option value="未选择">未选择</option>
                       <option value="男">男</option>
                       <option value="女">女</option>
                     </select>
@@ -336,17 +343,17 @@ const Login: React.FC = () => {
                   )}
                 </p>
                 <p><strong>邮箱: </strong>
-                  {editable ? (
-                    <input
-                      className="edit-input"
-                      type="text"
-                      name="qq"
-                      value={editedData.qq}
-                      onChange={handleChange}
-                    />
-                  ) : (
+                  {/*{editable ? (*/}
+                  {/*  <input*/}
+                  {/*    className="edit-input"*/}
+                  {/*    type="text"*/}
+                  {/*    name="qq"*/}
+                  {/*    value={editedData.qq}*/}
+                  {/*    onChange={handleChange}*/}
+                  {/*  />*/}
+                  {/*) : (*/}
                     <span>{editedData.qq}</span>
-                  )}
+                  {/*)}*/}
                 </p>
                 <p><strong>坤币: </strong>{kunCoin}</p>
                 <p><strong>个人简介: </strong>
@@ -390,14 +397,27 @@ const Login: React.FC = () => {
             <div >
               <Button type="primary" onClick={updateASKey} disabled={isUpdating}>
                 {isUpdating ? '正在更新...' : '点我更换签名和密钥'}
-              </Button> : 点击这个用来更新你访问接口的唯一标识<br/><br/>
+              </Button>
+            </div>
+            <div>
+              点我下载SDK
+              {/*todo 换成github地址*/}
+            </div>
+            <div>
+              {editedData.accessKey}
+            </div>
+            <div>
+              {editedData.secretKey}
+            </div>
+          </Card>
+
+          <Card title="用户操作："  type="inner" hoverable={true} >
+            <div type="primary">
               {/*<Button type="primary">点我去充值</Button><br/><br/>*/}
-              <Button type="primary" onClick={handleGoBack}>返回</Button> : 点我回主页<br/><br/>
+              <Button type="primary" onClick={handleGoBack}>返回主页</Button><br/><br/>
               {/*<Button type="primary">查看我的订单</Button><br/><br/>*/}
-              {/*<Button type="primary">邀请好友</Button><br/><br/>*/}
               <Button type="primary" onClick={doSign}>签到</Button> : 截至目前为止你已经连续签到 {numSign}天<br/><br/>
             </div>
-
           </Card>
         </div>
       </div>

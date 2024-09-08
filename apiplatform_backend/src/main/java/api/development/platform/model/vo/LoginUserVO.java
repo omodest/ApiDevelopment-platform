@@ -70,5 +70,14 @@ public class LoginUserVO implements Serializable {
      */
     private String telephone;
 
+    /**
+     *
+     */
+    private String accessKey;
+    /**
+     * 密钥
+     */
+    private String secretKey;
+
     private static final long serialVersionUID = 1L;
 }

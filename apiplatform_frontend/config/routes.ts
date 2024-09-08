@@ -84,6 +84,26 @@ export default [
     ],
   },
   {
+    path: '/order/list',
+    name: '我的订单',
+    icon: 'ProfileOutlined',
+    component: './Order/OrderList',
+  },
+  {
+    path: '/order/pay/:id',
+    icon: 'PayCircleOutlined',
+    name: '订单支付',
+    component: './Order/PayOrder',
+    hideInMenu: true,
+  },
+  {
+    path: '/order/info/:id',
+    icon: 'ProfileOutlined',
+    name: '订单详情',
+    component: './Order/OrderInfo',
+    hideInMenu: true,
+  },
+  {
     path: '*',
     layout: false,
     component: './404',

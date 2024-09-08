@@ -37,11 +37,13 @@ const TableList: React.FC = () => {
   const [currentRow, setCurrentRow] = useState<UserVO>();
   const [selectedRowsState, setSelectedRows] = useState<UserVO[]>([]);
   const [dataSource, setDataSource] = useState<UserVO[]>([]);
+  const [isDisabled, setIsDisabled] = useState<boolean>(true); // 状态控制按钮是否禁用
 
   useEffect(() => {
-    fetchData();
+    fetchData(); // 查询功能有点小问题；因为页面每次查询都会展示所有数据
   }, []);
 
+  // 初始化数据
   const fetchData = async () => {
     try {
       const response = await listUserVoByPageUsingPost({});
@@ -54,7 +56,7 @@ const TableList: React.FC = () => {
       message.error('请求失败，' + error.message);
     }
   };
-
+  // 添加（已废除）
   const handleAdd = async (fields: API.UserVO) => {
     const hide = message.loading('正在添加');
     try {
@@ -71,17 +73,17 @@ const TableList: React.FC = () => {
       return false;
     }
   };
-
+  // 修改（已废除）
   const handleUpdate = async (fields: API.UserUpdateRequest) => {
     if (!currentRow) {
       return;
     }
     const hide = message.loading('修改中');
     try {
-      await updateUserUsingPost({
-        id: currentRow.id,
-        ...fields
-      });
+      // await updateUserUsingPost({
+      //   id: currentRow.id,
+      //   ...fields
+      // });
       hide();
       message.success('操作成功');
       return true;
@@ -91,7 +93,7 @@ const TableList: React.FC = () => {
       return false;
     }
   };
-
+  // 删除
   const handleRemove = async (record: API.UserVO) => {
     const hide = message.loading('正在删除');
     if (!record) return true;
@@ -157,9 +159,12 @@ const TableList: React.FC = () => {
         <a
           key={`update-${record.id}`}
           onClick={() => {
-            handleUpdateModalVisible(true);
-            setCurrentRow(record);
+            if (!isDisabled) {
+              handleUpdateModalVisible(true);
+              setCurrentRow(record);
+            }
           }}
+          style={{ pointerEvents: isDisabled ? 'none' : 'auto', color: isDisabled ? 'grey' : 'blue' }}
         >
           修改
         </a>,
@@ -227,12 +232,14 @@ const TableList: React.FC = () => {
             onClick={() => {
               handleModalVisible(true);
             }}
+            disabled={true} // 设置为 true 禁用按钮
           >
             <PlusOutlined/> <FormattedMessage id="pages.searchTable.new" defaultMessage="New"/>
           </Button>,
         ]}
         dataSource={dataSource}
         columns={tableColumns}
+        request={listUserVoByPageUsingPost}
         rowSelection={{
           onChange: (_, selectedRows) => {
             setSelectedRows(selectedRows);
@@ -255,13 +262,14 @@ const TableList: React.FC = () => {
               setSelectedRows([]);
               actionRef.current?.reloadAndRest?.();
             }}
+            disabled={true}
           >
             <FormattedMessage
               id="pages.searchTable.batchDeletion"
               defaultMessage="Batch deletion"
             />
           </Button>
-          <Button type="primary">
+          <Button type="primary" disabled={true}>
             <FormattedMessage
               id="pages.searchTable.batchApproval"
               defaultMessage="Batch approval"

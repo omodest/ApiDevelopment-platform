@@ -16,6 +16,7 @@ import api.development.platform.utils.SqlUtils;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
@@ -336,7 +337,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         int dayOfMonth = now.getDayOfMonth();
         // 5. 写redis操作
         Boolean result = redisTemplate.opsForValue().setBit(key, dayOfMonth - 1, true);
-        if (result){
+        if (Boolean.TRUE.equals(result)){
             throw new BusinessException(ErrorCode.OPERATION_ERROR,"签到失败");
         }
         // 6. 签到得积分
@@ -445,5 +446,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }, "邮箱账号注册失败");
     }
 
-
+    @Override
+    public boolean addWalletBalance(Long userId, Integer addPoints) {
+        LambdaUpdateWrapper<User> userLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+        userLambdaUpdateWrapper.eq(User::getId, userId);
+        userLambdaUpdateWrapper.setSql("balance = balance + " + addPoints);
+        return this.update(userLambdaUpdateWrapper);
+    }
 }

@@ -142,6 +142,13 @@ public interface UserService extends IService<User> {
      */
     Long userEmailRegister(UserEmailRegisterRequest userEmailRegisterRequest);
 
-
+    /**
+     * 添加钱包余额
+     *
+     * @param userId    用户id
+     * @param addPoints 添加点
+     * @return boolean
+     */
+    boolean addWalletBalance(Long userId, Integer addPoints);
 
 }

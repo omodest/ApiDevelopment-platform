@@ -22,12 +22,7 @@ public class RedissonLockUtils {
 
     /**
      * redisson分布式锁
-     *
-     * @param lockName     锁名称
-     * @param supplier     供应商
-     * @param errorCode    错误代码
-     * @param errorMessage 错误消息
-     * @return {@link T}
+     * 确保了在执行 supplier 提供的操作时，只有获取到分布式锁的线程才能继续执行。
      */
     public <T> T redissonDistributedLocks(String lockName, Supplier<T> supplier, ErrorCode errorCode, String errorMessage) {
         RLock rLock = redissonClient.getLock(lockName);
