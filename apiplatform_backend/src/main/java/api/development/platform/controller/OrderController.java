@@ -33,6 +33,9 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -72,6 +75,7 @@ public class OrderController {
      */
     @GetMapping("/product/list/page")
     public BaseResponse<Page<ProductInfo>> listProductInfoByPage(ProductInfoQueryRequest productInfoQueryRequest, HttpServletRequest request) {
+        // 1. 参数校验
         if (productInfoQueryRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -79,16 +83,13 @@ public class OrderController {
         ProductInfo productInfoQuery = new ProductInfo();
         BeanUtils.copyProperties(productInfoQueryRequest, productInfoQuery);
         long size = productInfoQueryRequest.getPageSize();
-        String sortField = productInfoQueryRequest.getSortField();
-        String sortOrder = productInfoQueryRequest.getSortOrder();
-
         String name = productInfoQueryRequest.getName();
         long current = productInfoQueryRequest.getCurrent();
         String description = productInfoQueryRequest.getDescription();
         String productType = productInfoQueryRequest.getProductType();
         Integer addPoints = productInfoQueryRequest.getAddPoints();
         Integer total = productInfoQueryRequest.getTotal();
-        // 限制爬虫
+        // 2. 限制爬虫
         if (size > 50) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -98,10 +99,10 @@ public class OrderController {
                 .eq(StringUtils.isNotBlank(productType), "productType", productType)
                 .eq(ObjectUtils.isNotEmpty(addPoints), "addPoints", addPoints)
                 .eq(ObjectUtils.isNotEmpty(total), "total", total);
-        // 根据金额升序排列
+        // 3. 根据金额升序排列
         queryWrapper.orderByAsc("total");
         Page<ProductInfo> productInfoPage = productInfoService.page(new Page<>(current, size), queryWrapper);
-        // 不是管理员只能查看已经上线的
+        // 4. 不是管理员只能查看已经上线的
         if (!userService.isAdmin(request)) {
             List<ProductInfo> productInfoList = productInfoPage.getRecords().stream()
                     .filter(productInfo -> productInfo.getStatus().equals(ProductInfoStatusEnum.ONLINE.getValue())).collect(Collectors.toList());
@@ -118,6 +119,7 @@ public class OrderController {
      */
     @GetMapping("/order/list/page")
     public BaseResponse<OrderVo> listProductOrderByPage(ProductOrderQueryRequest productOrderQueryRequest, HttpServletRequest request) {
+        // 1. 参数校验
         if (productOrderQueryRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -137,10 +139,10 @@ public class OrderController {
         if (size > 50) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
+        // 2. 联表查询
         User loginUser = userService.getLoginUser(request);
         Long userId = loginUser.getId();
         QueryWrapper<ProductOrder> queryWrapper = new QueryWrapper<>();
-
         queryWrapper.like(StringUtils.isNotBlank(orderName), "orderName", orderName)
                 .like(StringUtils.isNotBlank(productInfo), "productInfo", productInfo)
                 .eq("userId", userId)
@@ -154,8 +156,22 @@ public class OrderController {
         Page<ProductOrder> productOrderPage = productOrderService.page(new Page<>(current, size), queryWrapper);
         OrderVo orderVo = new OrderVo();
         BeanUtils.copyProperties(productOrderPage, orderVo);
-        // 处理订单信息,
+        // 处理订单信息
         List<ProductOrderVo> productOrders = productOrderPage.getRecords().stream().map(this::formatProductOrderVo).collect(Collectors.toList());
+        // 处理过期订单
+        LocalDateTime now = LocalDateTime.now();
+        for (ProductOrderVo productOrderVo: productOrders){
+            Date expirationTime = productOrderVo.getExpirationTime();
+            if (expirationTime != null) {
+                // 转换 Date 到 LocalDateTime
+                LocalDateTime expirationDateTime = LocalDateTime.ofInstant(
+                        expirationTime.toInstant(), ZoneId.systemDefault());
+                // 检查过期时间是否在当前时间之前
+                if (expirationDateTime.isBefore(now)) {
+                    closedProductOrder(productOrderVo.getOrderNo());
+                }
+            }
+        }
         orderVo.setRecords(productOrders);
         return ResultUtils.success(orderVo);
     }
@@ -179,6 +195,9 @@ public class OrderController {
         return ResultUtils.success(closedResult);
     }
 
+    /**
+     * 整合需要的ProductOrderVo 对象
+     */
     private ProductOrderVo formatProductOrderVo(ProductOrder productOrder) {
         ProductOrderVo productOrderVo = new ProductOrderVo();
         BeanUtils.copyProperties(productOrder, productOrderVo);
@@ -294,5 +313,6 @@ public class OrderController {
         return ResultUtils.success(false);
     }
 
+    //
 }
 

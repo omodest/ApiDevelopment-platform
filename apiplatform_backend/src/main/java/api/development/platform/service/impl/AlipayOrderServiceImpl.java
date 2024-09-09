@@ -84,13 +84,14 @@ public class AlipayOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Prod
 
 
     /**
-     * 查询订单
+     * 查询订单信息
      * @param productId 产品id
      * @param loginUser 登录用户
      * @param payType   付款类型
      */
     @Override
     public ProductOrderVo getProductOrder(Long productId, UserVO loginUser, String payType) {
+        // mybatis plus 条件构造器
         LambdaQueryWrapper<ProductOrder> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(ProductOrder::getProductId, productId);
         lambdaQueryWrapper.eq(ProductOrder::getStatus, NOTPAY.getValue());
@@ -110,7 +111,7 @@ public class AlipayOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Prod
     }
 
     /**
-     * 创建订单数据，写入数据库
+     * 创建订单数据，写入数据库（这里会请求支付宝沙箱接口）
      * @param productId 产品id
      * @param loginUser 登录用户
      */
@@ -141,9 +142,9 @@ public class AlipayOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Prod
 
         boolean saveResult = this.save(productOrder);
 
-
         // 拿到付款链接，以及各种关于支付宝的各种信息
 
+        // 创建支付宝 client
         AlipayClient alipayClient = new
             DefaultAlipayClient(aliPayAccountConfig.getGatewayUrl(), aliPayAccountConfig.getAppId(), aliPayAccountConfig.getAppPrivateKey(),
         "json", aliPayAccountConfig.getCharset(), aliPayAccountConfig.getAliPayPublicKey(), aliPayAccountConfig.getSignType());
@@ -157,13 +158,15 @@ public class AlipayOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Prod
         BigDecimal scaledAmount = new BigDecimal(productInfo.getTotal()).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
         model.setTotalAmount(String.valueOf(scaledAmount));
         model.setBody(productInfo.getDescription());
-
+        // 设置请求参数
         AlipayTradePagePayRequest request = new AlipayTradePagePayRequest();
         request.setBizModel(model);
         request.setNotifyUrl(aliPayAccountConfig.getNotifyUrl());
         request.setReturnUrl(aliPayAccountConfig.getReturnUrl());
         try {
+            // 这一步是调用支付宝沙箱接口
             AlipayTradePagePayResponse alipayTradePagePayResponse = alipayClient.pageExecute(request);
+            // 拿到付款二维码地址
             String payUrl = alipayTradePagePayResponse.getBody();
             productOrder.setFormData(payUrl);
         } catch (AlipayApiException e) {
@@ -184,7 +187,7 @@ public class AlipayOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Prod
     }
 
     /**
-     * 更新订单的formData
+     * 创建订单时执行  更新订单的formData
      * @param productOrder 产品订单
      */
     @Override
@@ -197,6 +200,12 @@ public class AlipayOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Prod
         return this.updateById(updateCodeUrl);
     }
 
+    /**
+     * 修改订单状态
+     * @param outTradeNo  订单号
+     * @param orderStatus 订单状态
+     * @return
+     */
     @Override
     public boolean updateOrderStatusByOrderNo(String outTradeNo, String orderStatus) {
         ProductOrder productOrder = new ProductOrder();
@@ -208,6 +217,11 @@ public class AlipayOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Prod
         return this.update(productOrder, lambdaQueryWrapper);
     }
 
+    /**
+     * 取消订单
+     * @param outTradeNo 外贸编号
+     * @throws AlipayApiException
+     */
     @Override
     public void closedOrderByOrderNo(String outTradeNo) throws AlipayApiException {
         AlipayTradeCloseModel alipayTradeCloseModel = new AlipayTradeCloseModel();
@@ -217,6 +231,11 @@ public class AlipayOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Prod
         AliPayApi.doExecute(request);
     }
 
+    /**
+     * 根据交易编号获取订单
+     * @param outTradeNo 外贸编号
+     * @return
+     */
     @Override
     public ProductOrder getProductOrderByOutTradeNo(String outTradeNo) {
         LambdaQueryWrapper<ProductOrder> lambdaQueryWrapper = new LambdaQueryWrapper<>();
@@ -226,6 +245,10 @@ public class AlipayOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Prod
     }
 
 
+    /**
+     * 处理超时订单
+     * @param productOrder 产品订单
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void processingTimedOutOrders(ProductOrder productOrder) {
@@ -279,6 +302,11 @@ public class AlipayOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Prod
 
     }
 
+    /**
+     * 发送邮件
+     * @param productOrder
+     * @param orderTotal
+     */
     private void sendSuccessEmail(ProductOrder productOrder, String orderTotal) {
         // 发送邮件
         User user = userService.getById(productOrder.getUserId());
@@ -293,6 +321,7 @@ public class AlipayOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Prod
             }
         }
     }
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -338,12 +367,6 @@ public class AlipayOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Prod
             log.error("订单金额不一致");
             return result;
         }
-        // 3.校验通知中的 seller_id（或者 seller_email) 是否为 out_trade_no 这笔单据的对应的操作方（有的时候，一个商家可能有多个 seller_id/seller_email）。
-//        String sellerId = aliPayAccountConfig.getSellerId();
-//        if (!response.getSellerId().equals(sellerId)) {
-//            log.error("卖家账号校验失败");
-//            return result;
-//        }
         // 4.验证 app_id 是否为该商家本身。
         String appId = aliPayAccountConfig.getAppId();
         if (!response.getAppId().equals(appId)) {

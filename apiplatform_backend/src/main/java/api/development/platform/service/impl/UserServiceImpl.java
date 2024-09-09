@@ -346,7 +346,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return true;
     }
 
-    //  这里可以添加连续多少多少天签到，获得奖励，这个比较简单就不实现了
+    //  这里可以添加连续多少多少天签到，获得奖励
     @Override
     public Integer getConstantSignDay(HttpServletRequest httpServletRequest) {
         // 1. 验证当前用户

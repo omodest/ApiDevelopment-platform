@@ -100,6 +100,13 @@ const PayOrder: React.FC = () => {
       setQrCode(res.data.codeUrl)
     }
   }
+  /**
+   * 因为只提供一种支付方式，这个页面的功能虽然需要，但是页面不需要展示，这里直接重定向到我的订单页；
+   * 然后用户再点击支付支付订单
+   */
+  useEffect(() => {
+    history.push('/order/list');
+  }, []);
   useEffect(() => {
     if (urlPayType) {
       setPayType(urlPayType)

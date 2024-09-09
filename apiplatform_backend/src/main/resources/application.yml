@@ -111,20 +111,7 @@ cos:
     bucket: 1
 # 沙箱支付
 alipay:
-  # 支付宝应用ID
-  appId: a
-  # 应用私钥
-  appPrivateKey: a
-  # 应用公钥
-  alipayPublicKey: a
-  # 支付宝支付回调通知的地址 （这是我们后端自己提供的接口，由于需要使用公网地址这里就不使用8081，使用内网穿透地址；注意：内网穿透地址每次启动都会改变）
-  notifyUrl:  a
-  # 支付完成后的回调地址 (前端地址)
-  returnUrl: a
-  signType: RSA2
-  charset: utf-8
-  # 支付宝网关地址
-  gatewayUrl: https://openapi-sandbox.dl.alipaydev.com/gateway.do
+
 
 
 # 接口文档配置
