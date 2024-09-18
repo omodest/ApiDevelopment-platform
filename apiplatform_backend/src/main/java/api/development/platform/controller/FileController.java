@@ -34,23 +34,26 @@ public class FileController {
     @Resource
     private UserService userService;
 
+    /**
+     * 腾讯对象存储
+     */
     @Resource
     private CosManager cosManager;
 
     /**
-     * 文件上传
+     * 头像上传
      *
-     * @param multipartFile
+     * @param multipartFile 拿到的前端上传的头像
      * @param uploadFileRequest 上传文件请求
      * @param request http请求信息
-     * @return
+     * @return 存储上传的图片的路径(COS访问地址 + 生成文件目录)
      */
     @PostMapping("/upload")
     public BaseResponse<String> uploadFile(@RequestPart("file") MultipartFile multipartFile,
             // @RequestPart 用于处理HTTP请求中的多部分请求（multipart/form-data）
             // "file" 指form-data类型
             UploadFileRequest uploadFileRequest, HttpServletRequest request) {
-        // 1. 获取上次的图片用处，比如说用户头像
+        // 1. 获取上次的图片用途，比如说用户头像(可以去FileUploadBizEnum 这个枚举类中补充其他用途)
         String biz = uploadFileRequest.getBiz();
         FileUploadBizEnum fileUploadBizEnum = FileUploadBizEnum.getEnumByValue(biz);
         if (fileUploadBizEnum == null) {
@@ -87,9 +90,8 @@ public class FileController {
     }
 
     /**
-     * 校验文件
-     *
-     * @param multipartFile
+     * 头像上传校验
+     * @param multipartFile 拿到的前端上传的头像
      * @param fileUploadBizEnum 业务类型
      */
     private void validFile(MultipartFile multipartFile, FileUploadBizEnum fileUploadBizEnum) {
@@ -98,6 +100,7 @@ public class FileController {
         // 文件后缀
         String fileSuffix = FileUtil.getSuffix(multipartFile.getOriginalFilename());
         final long ONE_M = 1024 * 1024L;
+        // 当前项目只提供上传用途为‘头像’，即USER_AVATAR；(如果需要可以去FileUploadBizEnum 这个枚举类中补充其他文件上传用途)
         if (FileUploadBizEnum.USER_AVATAR.equals(fileUploadBizEnum)) {
             if (fileSize > ONE_M) {
                 throw new BusinessException(ErrorCode.PARAMS_ERROR, "文件大小不能超过 1M");

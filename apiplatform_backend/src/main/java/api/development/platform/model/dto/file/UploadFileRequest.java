@@ -10,9 +10,12 @@ import lombok.Data;
 public class UploadFileRequest implements Serializable {
 
     /**
-     * 业务
+     * 业务(上传文件的用途)
      */
     private String biz;
 
+    /**
+     * 序列化id
+     */
     private static final long serialVersionUID = 1L;
 }

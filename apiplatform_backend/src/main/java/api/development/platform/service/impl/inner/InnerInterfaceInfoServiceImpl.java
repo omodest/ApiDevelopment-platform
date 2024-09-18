@@ -13,10 +13,10 @@ import javax.annotation.Resource;
 
 /**
  * 内部接口服务实现类
- *
+ * 注册到dubbo，提供远程调用
  */
 @DubboService
-public class InnerInterfaceInfoServiceImpl implements InnerInterfaceInfoService {
+public class  InnerInterfaceInfoServiceImpl implements InnerInterfaceInfoService {
 
     @Resource
     private InterfaceInfoMapper interfaceInfoMapper;

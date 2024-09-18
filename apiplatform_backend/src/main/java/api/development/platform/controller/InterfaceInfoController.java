@@ -1,14 +1,20 @@
 package api.development.platform.controller;
 
 import api.development.apiplatform_client_sdk.client.NameClient;
+import api.development.apiplatform_client_sdk.model.UserSignature;
+import api.development.apiplatform_client_sdk.model.request.CurrencyRequest;
+import api.development.apiplatform_client_sdk.model.response.ResultResponse;
+import api.development.apiplatform_client_sdk.services.ApiServices;
 import api.development.apiplatform_interface.model.entity.InterfaceInfo;
 import api.development.apiplatform_interface.model.entity.User;
+import api.development.apiplatform_interface.model.entity.UserInterfaceInfo;
 import api.development.platform.annotation.AuthCheck;
 import api.development.platform.common.*;
 import api.development.platform.constant.CommonConstant;
 import api.development.platform.constant.UserConstant;
 import api.development.platform.exception.BusinessException;
 import api.development.platform.exception.ThrowUtils;
+import api.development.platform.mapper.UserInterfaceInfoMapper;
 import api.development.platform.model.dto.InterfaceInfo.InterfaceInfoAddRequest;
 import api.development.platform.model.dto.InterfaceInfo.InterfaceInfoInvokeRequest;
 import api.development.platform.model.dto.InterfaceInfo.InterfaceInfoQueryRequest;
@@ -19,15 +25,21 @@ import api.development.platform.service.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeanUtils;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 接口信息
@@ -43,6 +55,15 @@ public class InterfaceInfoController {
     @Resource
     private UserService userService;
 
+    @Resource
+    private UserInterfaceInfoMapper userInterfaceInfoMapper;
+
+    @Resource
+    private ApiServices apiServices;
+
+    /**
+     * 接口远程调用 Client
+     */
     @Resource
     private NameClient nameClient;
 
@@ -60,12 +81,16 @@ public class InterfaceInfoController {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         InterfaceInfo interfaceInfo = new InterfaceInfo();
-        BeanUtils.copyProperties(interfaceInfoAddRequest, interfaceInfo); // 将 第一个javabean中的属性复制到第二个javabean
+        // 将 第一个javabean中的属性复制到第二个javabean
+        BeanUtils.copyProperties(interfaceInfoAddRequest, interfaceInfo);
+        // 接口校验
         interfaceInfoService.validInterfaceInfo(interfaceInfo, true);
         User loginUser = userService.getLoginUser(request);
-        interfaceInfo.setUserId(loginUser.getId()); // 设置用户id
+        // 设置用户id
+        interfaceInfo.setUserId(loginUser.getId());
         boolean result = interfaceInfoService.save(interfaceInfo);
-        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR); // 自定义异常类
+        // 自定义异常类
+        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         long newInterfaceInfoId = interfaceInfo.getId();
         return ResultUtils.success(newInterfaceInfoId);
     }
@@ -86,7 +111,7 @@ public class InterfaceInfoController {
         // 判断是否存在
         InterfaceInfo oldInterfaceInfo = interfaceInfoService.getById(id);
         ThrowUtils.throwIf(oldInterfaceInfo == null, ErrorCode.NOT_FOUND_ERROR);
-        // 仅本人或管理员可删除
+        // 仅本人或管理员可删除(即不是本人，又不是管理员，抛异常)
         if (!oldInterfaceInfo.getUserId().equals(user.getId()) && !userService.isAdmin(request)) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
@@ -96,9 +121,8 @@ public class InterfaceInfoController {
 
     /**
      * 更新（仅管理员）
-     *
-     * @param interfaceInfoUpdateRequest
-     * @return
+     * @param interfaceInfoUpdateRequest 修改请求
+     * @return 操作结果
      */
     @PostMapping("/update")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
@@ -107,7 +131,7 @@ public class InterfaceInfoController {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         InterfaceInfo interfaceInfo = new InterfaceInfo();
-        BeanUtils.copyProperties(interfaceInfoUpdateRequest, interfaceInfo); //
+        BeanUtils.copyProperties(interfaceInfoUpdateRequest, interfaceInfo);
         // 参数校验
         interfaceInfoService.validInterfaceInfo(interfaceInfo, true);
         long id = interfaceInfoUpdateRequest.getId();
@@ -124,17 +148,16 @@ public class InterfaceInfoController {
     }
 
     /**
-     * 接口发布
-     * @param idRequest
-     * @param httpServletRequest
-     * @return
+     * 接口发布（这里添加接口）
+     * @param idRequest 接口id
+     * @return 操作结果
      */
     @PostMapping("/online")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE) // aop 自定义注解，检验是否是管理员
-    public BaseResponse<Boolean> onlineInterfaceInfo(@RequestBody IdRequest idRequest, HttpServletRequest httpServletRequest){
+    public BaseResponse<Boolean> onlineInterfaceInfo(@RequestBody IdRequest idRequest){
         // 参数校验
         long id = idRequest.getId();
-        if (id <= 0 || idRequest == null){
+        if (id <= 0){
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         // 查询数据
@@ -142,15 +165,17 @@ public class InterfaceInfoController {
         if (interfaceInfoServiceById == null){
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
-        // 使用interface项目中的方法，验证接口是否能访问同
-        // todo 目前这里仅是使用了测试接口，后续将接口改成数据库中相应数据
-        api.development.apiplatform_client_sdk.model.User user = new api.development.apiplatform_client_sdk.model.User();
-        user.setName("roqweqeot1"); // 这里不能出现中文，会乱码，导致在自定义sdk中不匹配，出现无权限错误
-        String userNameByPost = nameClient.getUserNameByPost(user);
-        if (StringUtils.isAnyBlank(userNameByPost) || StringUtils.contains(userNameByPost,"无权限")){
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "接口验证错误");
-        }
-        // 修改状态为上线
+
+        // 使用interface项目模块中的方法，验证接口是否能访问同
+//        api.development.apiplatform_client_sdk.model.params.NameParams user = new api.development.apiplatform_client_sdk.model.params.NameParams();
+//        user.setName("roqweqeot1"); // 这里不能出现中文，会乱码，导致在自定义sdk中不匹配，出现无权限错误
+//        String userNameByPost = nameClient.getUserNameByPost(user);
+
+//        if (StringUtils.isAnyBlank(userNameByPost) || StringUtils.contains(userNameByPost,"无权限")){
+//            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "接口验证错误");
+//        }
+
+        // 修改接口状态为上线
         InterfaceInfo interfaceInfo = new InterfaceInfo();
         interfaceInfo.setId(id);
         interfaceInfo.setInterfaceStatus(InterfaceStatusEnum.ONLINE.getValue());
@@ -159,16 +184,19 @@ public class InterfaceInfoController {
     }
     /**
      * 接口 在线调用
-     * @param interfaceInfoInvokeRequest
-     * @param httpServletRequest
+     * @param interfaceInfoInvokeRequest 调用接口请求
+     * @param httpServletRequest 客户端请求
      * @return
      */
     @PostMapping("/invoke")
+    @Transactional(rollbackFor = Exception.class)
     public BaseResponse<Object> invokeInterfaceInfo(@RequestBody InterfaceInfoInvokeRequest interfaceInfoInvokeRequest, HttpServletRequest httpServletRequest){
+        // 这里设置断点
+        System.out.println("Received request: " + interfaceInfoInvokeRequest);
+
+        // 1. 参数校验
         Long id = interfaceInfoInvokeRequest.getId();
-        String requestParams = interfaceInfoInvokeRequest.getRequestParams();
-        // 参数校验
-        if (interfaceInfoInvokeRequest == null || id <= 0){
+        if (ObjectUtils.isEmpty(interfaceInfoInvokeRequest.getRequestParams()) || id <= 0){
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         // 查询数据是否存在
@@ -176,29 +204,46 @@ public class InterfaceInfoController {
         if (oldInterfaceInfo  == null){
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
+        // 校验接口状态
         if (oldInterfaceInfo.getInterfaceStatus().equals(InterfaceStatusEnum.OFFLINE)){
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"接口已关闭");
         }
-        // 查询调用接口的用户
+        // 查询调用接口的用户,校验用户是否有调用次数是否大于0
         User loginUser = userService.getLoginUser(httpServletRequest);
         String accessKey = loginUser.getAccessKey();
         String secretKey = loginUser.getSecretKey();
-        NameClient nc = new NameClient(accessKey, secretKey);
+        Long loginUserId = loginUser.getId();
+        QueryWrapper<UserInterfaceInfo> userInterfaceInfoQueryWrapper = new QueryWrapper<>();
+        userInterfaceInfoQueryWrapper.eq("interfaceInfoId", id);
+        userInterfaceInfoQueryWrapper.eq("userId",loginUserId);
+        UserInterfaceInfo userInterfaceInfo = userInterfaceInfoMapper.selectOne(userInterfaceInfoQueryWrapper);
+        if (userInterfaceInfo.getLeftNum() <= 0){
+            throw new BusinessException(ErrorCode.OPERATION_ERROR,"用户剩余调用次数不足");
+        }
+
+        // 2. 构建查询参数
         Gson gson = new Gson();
-        api.development.apiplatform_client_sdk.model.User user1 = null;
-        String userNameByPost = "";
+        List<InterfaceInfoInvokeRequest.Field> fieldList = interfaceInfoInvokeRequest.getRequestParams();
+        String requestParams = "{}";
+        if (fieldList != null && fieldList.size() > 0) {
+            JsonObject jsonObject = new JsonObject();
+            for (InterfaceInfoInvokeRequest.Field field : fieldList) {
+                jsonObject.addProperty(field.getFieldName(), field.getValue());
+            }
+            requestParams = gson.toJson(jsonObject);
+        }
+        Map<String, Object> params = new Gson().fromJson(requestParams, new TypeToken<Map<String, Object>>() {
+        }.getType());
         try {
             // 确保 requestParams 是一个有效的 JSON 字符串
-            if (requestParams != null && !requestParams.trim().isEmpty()) {
-                user1 = gson.fromJson(requestParams, api.development.apiplatform_client_sdk.model.User.class);
-            }
 
-            if (user1 != null) {
-                userNameByPost = nc.getUserNameByPost(user1);
-                System.out.println("UserName: " + userNameByPost);
-            } else {
-                System.out.println("User1 is null after JSON parsing.");
-            }
+            UserSignature qiApiClient = new UserSignature(accessKey, secretKey);
+            CurrencyRequest currencyRequest = new CurrencyRequest();
+            currencyRequest.setMethod(oldInterfaceInfo.getInterfaceType());
+            currencyRequest.setPath(oldInterfaceInfo.getInterfaceUrl());
+            currencyRequest.setRequestParams(params);
+            ResultResponse response = apiServices.request(qiApiClient, currencyRequest);
+            return ResultUtils.success(response.getData());
         } catch (JsonSyntaxException e) {
             // 处理 JSON 解析异常
             System.err.println("Failed to parse JSON: " + e.getMessage());
@@ -206,19 +251,17 @@ public class InterfaceInfoController {
             // 处理其他可能的异常
             System.err.println("An error occurred: " + e.getMessage());
         }
-
-        return ResultUtils.success(userNameByPost);
+        return null;
     }
 
     /**
      * 下线
-     * @param idRequest
-     * @param httpServletRequest
-     * @return
+     * @param idRequest 接口id
+     * @return 操作结果
      */
     @PostMapping("/offline")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE) // aop 自定义注解，检验是否是管理员
-    public BaseResponse<Boolean> offlineInterfaceInfo(@RequestBody IdRequest idRequest, HttpServletRequest httpServletRequest){
+    public BaseResponse<Boolean> offlineInterfaceInfo(@RequestBody IdRequest idRequest){
         // 参数校验
         long id = idRequest.getId();
         if (id <= 0 || idRequest == null){
@@ -230,7 +273,7 @@ public class InterfaceInfoController {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
 
-        // 修改状态为上线
+        // 修改状态为下线
         InterfaceInfo interfaceInfo = new InterfaceInfo();
         interfaceInfo.setId(id);
         interfaceInfo.setInterfaceStatus(InterfaceStatusEnum.OFFLINE.getValue());
@@ -241,9 +284,6 @@ public class InterfaceInfoController {
 
     /**
      * 根据 id 获取
-     *
-     * @param id
-     * @return
      */
     @GetMapping("/get")
     public BaseResponse<InterfaceInfo> getInterfaceInfoVOById(long id) {
@@ -255,13 +295,12 @@ public class InterfaceInfoController {
     }
 
     /**
-     * 分页获取列表（仅管理员）
+     * 分页获取列表
      * 这里的page对象使用，需要对mybatis plus的分页功能进行配置（ mybatisPlusInterceptor中已配置）
-     * @param interfaceInfoQueryRequest
-     * @return
+     * @param interfaceInfoQueryRequest 查询请求
+     * @return 返回所有接口数据
      */
     @GetMapping("/list")
-//    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<List<InterfaceInfo>> listInterfaceInfoByPage(InterfaceInfoQueryRequest interfaceInfoQueryRequest) {
         InterfaceInfo interfaceInfoQuery = new InterfaceInfo();
         if (interfaceInfoQueryRequest != null) {
@@ -274,15 +313,12 @@ public class InterfaceInfoController {
     }
 
     /**
-     * 分页获取列表（封装类）
-     *
-     * @param interfaceInfoQueryRequest
-     * @param request
-     * @return
+     * 分页获取列表
+     * @param interfaceInfoQueryRequest 查询请求
+     * @return 查询结果
      */
     @PostMapping("/list/page")
-    public BaseResponse<Page<InterfaceInfo>> listInterfaceInfoVOByPage(@RequestBody InterfaceInfoQueryRequest interfaceInfoQueryRequest,
-            HttpServletRequest request) {
+    public BaseResponse<Page<InterfaceInfo>> listInterfaceInfoVOByPage(@RequestBody InterfaceInfoQueryRequest interfaceInfoQueryRequest) {
         if (interfaceInfoQueryRequest == null){
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -298,7 +334,7 @@ public class InterfaceInfoController {
         // 限制爬虫
         ThrowUtils.throwIf(size > 50,ErrorCode.PARAMS_ERROR);
         // 拼接查询条件
-        QueryWrapper queryWrapper = new QueryWrapper<>(interfaceInfo);
+        QueryWrapper<InterfaceInfo> queryWrapper = new QueryWrapper<>(interfaceInfo);
         queryWrapper.like(StringUtils.isNotBlank(interfaceInfo.getInterfaceDescript()),"description",description);
         queryWrapper.orderBy(StringUtils.isNotBlank(sortField),sortOrder.equals(CommonConstant.SORT_ORDER_ASC),sortField);
         // 获取分页查询结果

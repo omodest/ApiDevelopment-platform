@@ -6,9 +6,6 @@ import * as analysisController from './analysisController';
 import * as fileController from './fileController';
 import * as interfaceInfoController from './interfaceInfoController';
 import * as orderController from './orderController';
-import * as postController from './postController';
-import * as postFavourController from './postFavourController';
-import * as postThumbController from './postThumbController';
 import * as userController from './userController';
 import * as userInterfaceInfoController from './userInterfaceInfoController';
 import * as wxMpController from './wxMpController';
@@ -18,9 +15,6 @@ export default {
   fileController,
   interfaceInfoController,
   orderController,
-  postController,
-  postFavourController,
-  postThumbController,
   userController,
   userInterfaceInfoController,
 };

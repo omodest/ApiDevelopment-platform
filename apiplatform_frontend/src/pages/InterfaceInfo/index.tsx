@@ -14,6 +14,7 @@ const Index: React.FC = () => {
   const [data, setData] = useState<API.InterfaceInfo>();
   const [invokeRes, setInvokeRes] = useState<any>();
   const [invokeLoading, setInvokeLoading] = useState(false);
+  const [requestParams, setRequestParams] = useState<[]>(); // 处理下在线调用请求示例
 
   const params = useParams();
 
@@ -43,15 +44,21 @@ const Index: React.FC = () => {
       message.error('接口不存在');
       return;
     }
+    try {
+      setRequestParams(values ? JSON.parse(values.requestParams) : [])
+    }catch (e) {
+      console.log("json转换失败")
+    }
     // 在开始调用接口之前，将 invokeLoading 设首为 true，表示正在加载中
     setInvokeLoading(true);
     try {
       const res = await invokeInterfaceInfoUsingPost({
         id: params.id,
-        ...values,
+        requestParams,
       });
+      console.log(res.data)
       // 将接口调用的结果(res.data)更新到 invokeRes 状态变量中
-      setInvokeRes(res.data);
+      setInvokeRes(JSON.stringify(res.data, null, 4))
       message.success('请求成功');
     } catch (error: any) {
       message.error('操作失败，' + error.message);
@@ -59,7 +66,7 @@ const Index: React.FC = () => {
     // 无论成功或失败，最后将 invokeLoading 设置为 false，表示加载完成
     setInvokeLoading(false);
   };
-console.log(data)
+
   return (
     <PageContainer title="查看接口文档">
       <Card>
@@ -69,6 +76,7 @@ console.log(data)
             <Descriptions.Item label="描述">{data.interfaceDescript}</Descriptions.Item>
             <Descriptions.Item label="请求地址">{data.interfaceUrl}</Descriptions.Item>
             <Descriptions.Item label="请求方法">{data.interfaceType}</Descriptions.Item>
+            {/*<DescriptAAAions.Item label="请求实例">{data.}</DescriptAAAions.Item>*/}
             <Descriptions.Item label="请求参数">{data.requestParams}</Descriptions.Item>
             <Descriptions.Item label="请求头">{data.requestHeader}</Descriptions.Item>
             <Descriptions.Item label="响应头">{data.responceHeader}</Descriptions.Item>
@@ -84,7 +92,7 @@ console.log(data)
         <Form name="invoke" layout="vertical" onFinish={onFinish}>
           {/*这里的name要与后端的字段映射*/}
           <Form.Item label="请求参数" name="requestParams">
-            <Input.TextArea />
+            <Input.TextArea style={{ height: '200px' }}/>
           </Form.Item>
           <Form.Item wrapperCol={{ span: 16 }}>
             <Button type="primary" htmlType="submit">

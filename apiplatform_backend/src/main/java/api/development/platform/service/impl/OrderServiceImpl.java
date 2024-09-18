@@ -39,6 +39,9 @@ public class OrderServiceImpl implements OrderService {
     @Resource
     private List<ProductOrderService> productOrderServices;
 
+    /**
+     *  分布式锁
+     */
     @Resource
     private RedissonLockUtils redissonLockUtil;
 
@@ -58,6 +61,13 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.PARAMS_ERROR, "暂无该支付方式"));
     }
 
+    /**
+     * 根据支付类型创建订单
+     * @param productId 产品id
+     * @param payType   付款类型
+     * @param loginUser 登录用户
+     * @return
+     */
     @Override
     @Transactional(rollbackFor = Exception.class) // 事务注解
     public ProductOrderVo createOrderByPayType(Long productId, String payType, UserVO loginUser) {

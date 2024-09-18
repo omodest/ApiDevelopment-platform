@@ -43,9 +43,6 @@ public class UserInterfaceInfoController {
 
     /**
      * 创建
-     * @param userInterfaceInfoAddRequest
-     * @param request
-     * @return
      */
     @PostMapping("/add")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
@@ -54,22 +51,22 @@ public class UserInterfaceInfoController {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         UserInterfaceInfo userInterfaceInfo = new UserInterfaceInfo();
-        BeanUtils.copyProperties(userInterfaceInfoAddRequest, userInterfaceInfo); // 将 第一个javabean中的属性复制到第二个javabean
+        // 将 第一个javabean中的属性复制到第二个javabean
+        BeanUtils.copyProperties(userInterfaceInfoAddRequest, userInterfaceInfo);
         // 校验
         userInterfaceInfoService.validUserInterfaceInfo(userInterfaceInfo, true);
         User loginUser = userService.getLoginUser(request);
-        userInterfaceInfo.setUserId(loginUser.getId()); // 设置用户id
+        // 设置用户id
+        userInterfaceInfo.setUserId(loginUser.getId());
         boolean result = userInterfaceInfoService.save(userInterfaceInfo);
-        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR); // 自定义异常类
+        // 自定义异常类
+        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         long newUserInterfaceInfoId = userInterfaceInfo.getId();
         return ResultUtils.success(newUserInterfaceInfoId);
     }
 
     /**
      * 删除
-     * @param deleteRequest
-     * @param request
-     * @return
      */
     @PostMapping("/delete")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
@@ -92,9 +89,6 @@ public class UserInterfaceInfoController {
 
     /**
      * 更新
-     *
-     * @param userInterfaceInfoUpdateRequest
-     * @return
      */
     @PostMapping("/update")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
@@ -123,9 +117,6 @@ public class UserInterfaceInfoController {
 
     /**
      * 根据 id 获取
-     *
-     * @param id
-     * @return
      */
     @GetMapping("/get")
     public BaseResponse<UserInterfaceInfo> getUserInterfaceInfoVOById(long id) {
@@ -139,8 +130,6 @@ public class UserInterfaceInfoController {
     /**
      * 分页获取列表（仅管理员）
      * 这里的page对象使用，需要对mybatis plus的分页功能进行配置（ mybatisPlusInterceptor中已配置）
-     * @param userInterfaceInfoQueryRequest
-     * @return
      */
     @GetMapping("/list")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
@@ -156,10 +145,6 @@ public class UserInterfaceInfoController {
 
     /**
      * 分页获取列表
-     *
-     * @param userInterfaceInfoQueryRequest
-     * @param request
-     * @return
      */
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     @GetMapping("/list/page")

@@ -77,7 +77,7 @@ export async function getLoginUserUsingGet(options?: { [key: string]: any }) {
 
 /** getSignNum GET /api/user/get/totalSign */
 export async function getSignNumUsingGet(options?: { [key: string]: any }) {
-  return request<API.BaseResponse>('/api/user/get/totalSign', {
+  return request<API.BaseResponseInt_>('/api/user/get/totalSign', {
     method: 'GET',
     ...(options || {}),
   });

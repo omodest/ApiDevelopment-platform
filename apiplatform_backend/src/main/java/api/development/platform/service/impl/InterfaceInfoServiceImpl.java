@@ -18,13 +18,17 @@ import org.springframework.stereotype.Service;
 public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, InterfaceInfo>
     implements InterfaceInfoService{
 
+    /**
+     * 接口参数校验
+     * @param interfaceInfo
+     * @param add
+     */
     @Override
     public void validInterfaceInfo(InterfaceInfo interfaceInfo, boolean add) {
         if (interfaceInfo == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         String interfaceName = interfaceInfo.getInterfaceName();
-
         // 创建时，参数不能为空
         if (add) {
             if (StringUtils.isAnyBlank(interfaceName)){

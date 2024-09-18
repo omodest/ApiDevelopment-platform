@@ -87,14 +87,14 @@ public class CustomGlobalFilter  implements
         // 3. 用户鉴权（判断 ak、sk 是否合法）
         HttpHeaders headers = request.getHeaders();
         String accessKey = headers.getFirst("accessKey");
-        String nonce = headers.getFirst("nonce");
+//        String nonce = headers.getFirst("nonce");
         String timestamp = headers.getFirst("timestamp");
         String sign = headers.getFirst("sign");
         String body = headers.getFirst("body");
         // 获取当前用户
         User invokeUser = null;
         try {
-            invokeUser = innerUserService.getInvokeUser(accessKey);
+            invokeUser = innerUserService.getInvokeUser(accessKey); // dubbo 远程调用
         } catch (Exception e) {
             log.error("getInvokeUser error", e);
         }
@@ -102,9 +102,9 @@ public class CustomGlobalFilter  implements
             return handleNoAuth(response);
         }
 
-        if (Long.parseLong(nonce) > 10000L) {
-            return handleNoAuth(response);
-        }
+//        if (Long.parseLong(nonce) > 10000L) {
+//            return handleNoAuth(response);
+//        }
         // 时间和当前时间不能超过 5 分钟
         Long currentTime = System.currentTimeMillis() / 1000; // 拿到时间戳
         final Long FIVE_MINUTES = 60 * 5L; // 5分钟时间间隔

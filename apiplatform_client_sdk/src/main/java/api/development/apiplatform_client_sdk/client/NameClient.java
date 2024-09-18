@@ -1,7 +1,7 @@
 package api.development.apiplatform_client_sdk.client;
 
 
-import api.development.apiplatform_client_sdk.model.User;
+import api.development.apiplatform_client_sdk.model.params.NameParams;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
@@ -20,14 +20,15 @@ import static api.development.apiplatform_client_sdk.utils.SignUtils.getSignUtil
  */
 public class NameClient {
 
+    private String accessKey;
+
+    private String secretKey;
+
     public NameClient(String accessKey, String secretKey) {
         this.accessKey = accessKey;
         this.secretKey = secretKey;
     }
 
-    private String accessKey;
-
-    private String secretKey;
 
 
     // 使用get方法从服务器获取客户信息
@@ -49,7 +50,7 @@ public class NameClient {
         return result;
     }
     // 使用POST方法向服务器发送user对象，并获取服务器返回的结果
-    public String getUserNameByPost(User user){
+    public String getUserNameByPost(NameParams user){
         String jsonStr = JSONUtil.toJsonStr(user);
         // 使用HttpRequest工具发起POST请求，并获取服务器的响应
         HttpResponse httpResponse = HttpRequest.post("http://localhost:8111/api/name/user")

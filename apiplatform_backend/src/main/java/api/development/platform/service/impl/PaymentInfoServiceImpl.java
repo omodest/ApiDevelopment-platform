@@ -18,6 +18,11 @@ import org.springframework.stereotype.Service;
 public class PaymentInfoServiceImpl extends ServiceImpl<PaymentInfoMapper, PaymentInfo>
     implements PaymentInfoService{
 
+    /**
+     * 创建支付信息记录
+     * @param paymentInfoVo 付款信息vo
+     * @return
+     */
     @Override
     public boolean createPaymentInfo(PaymentInfoVo paymentInfoVo) {
         String transactionId = paymentInfoVo.getTransactionId();
@@ -25,8 +30,6 @@ public class PaymentInfoServiceImpl extends ServiceImpl<PaymentInfoMapper, Payme
         String tradeState = paymentInfoVo.getTradeState();
         String tradeStateDesc = paymentInfoVo.getTradeStateDesc();
         String successTime = paymentInfoVo.getSuccessTime();
-//        WxPayOrderQueryV3Result.Payer payer = paymentInfoVo.getPayer();
-//        WxPayOrderQueryV3Result.Amount amount = paymentInfoVo.getAmount();
 
         PaymentInfo paymentInfo = new PaymentInfo();
         paymentInfo.setOrderNo(paymentInfoVo.getOutTradeNo());
@@ -36,11 +39,6 @@ public class PaymentInfoServiceImpl extends ServiceImpl<PaymentInfoMapper, Payme
         if (StringUtils.isNotBlank(successTime)) {
             paymentInfo.setSuccessTime(successTime);
         }
-//        paymentInfo.setOpenid(payer.getOpenid());
-//        paymentInfo.setPayerTotal(amount.getPayerTotal());
-//        paymentInfo.setCurrency(amount.getCurrency());
-//        paymentInfo.setPayerCurrency(amount.getPayerCurrency());
-//        paymentInfo.setTotal(amount.getTotal());
         paymentInfo.setTradeStateDesc(tradeStateDesc);
         paymentInfo.setContent(JSONUtil.toJsonStr(paymentInfoVo));
         return this.save(paymentInfo);

@@ -17,10 +17,6 @@ public class AliPayAccountConfig {
     private String appId;
 
     /**
-     * sellerId
-     */
-//    private String sellerId;
-    /**
      * 商户私钥
      */
     private String appPrivateKey;
@@ -29,12 +25,12 @@ public class AliPayAccountConfig {
      */
     private String aliPayPublicKey;
     /**
-     * 异步通知url
+     * 异步通知url；后端请求
      */
     private String notifyUrl;
 
     /**
-     * 同步返回的url
+     * 同步返回的url; 支付完后重定向到的前端路径
      */
     private String returnUrl;
 
@@ -43,7 +39,13 @@ public class AliPayAccountConfig {
      */
     private String gatewayUrl;
 
+    /**
+     * 加密类型
+     */
     private String signType;
 
+    /**
+     * 字符格式
+     */
     private String charset;
 }

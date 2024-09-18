@@ -42,20 +42,20 @@ public class AnalysisController {
     public BaseResponse<List<InterfaceInfoVO>> listTopInvokeInterfaceInfo() {
         // 查询userInterfaceInfo 调用次数最高的三个接口，封装到List
         List<UserInterfaceInfo> userInterfaceInfoList = userInterfaceInfoMapper.listTopInvokeInterfaceInfo(3);
-        // 对userInterfaceInfo 分组，这里的键是id，值就是interfaceInfoId
+        // 对userInterfaceInfo 分组，作用就是用来计数（这里的键是id，值就是interfaceInfoId）
         Map<Long, List<UserInterfaceInfo>> interfaceInfoIdObjMap = userInterfaceInfoList.stream()
                 .collect(Collectors.groupingBy(UserInterfaceInfo::getInterfaceInfoId));
         QueryWrapper<InterfaceInfo> queryWrapper = new QueryWrapper<>();
-        // 按照 id查询
         queryWrapper.in("id", interfaceInfoIdObjMap.keySet());
+        // 按照 id查询，这里的list 用来给返回前端的vo对象赋值
         List<InterfaceInfo> list = interfaceInfoService.list(queryWrapper);
         if (CollectionUtils.isEmpty(list)) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR);
         }
+        // 使用流特性给返回给前端的vo对象设置：totalNum(调用总次数：用来前端绘制图表)；
         List<InterfaceInfoVO> interfaceInfoVOList = list.stream().map(interfaceInfo -> {
             InterfaceInfoVO interfaceInfoVO = new InterfaceInfoVO();
             BeanUtils.copyProperties(interfaceInfo, interfaceInfoVO);
-
             int totalNum = interfaceInfoIdObjMap.get(interfaceInfo.getId()).get(0).getTotalNum();
             interfaceInfoVO.setTotalNum(totalNum);
             return interfaceInfoVO;

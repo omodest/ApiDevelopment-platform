@@ -1,9 +1,10 @@
-import {Card, message, QRCode, Radio, Spin} from 'antd';
+// import {Card, QRCode, Radio, Spin} from 'antd';
 import React, {useEffect, useState} from 'react';
+import {message} from 'antd';
 import {history} from '@umijs/max';
-import WxPay from "@/components/Icon/WxPay";
-import ProCard from "@ant-design/pro-card";
-import Alipay from "@/components/Icon/Alipay";
+// import WxPay from "@/components/Icon/WxPay";
+// import ProCard from "@ant-design/pro-card";
+// import Alipay from "@/components/Icon/Alipay";
 // import { valueLength } from "@/pages/User/UserInfo";
 import {useParams} from "@@/exports";
 import {
@@ -22,7 +23,7 @@ const PayOrder: React.FC = () => {
   const codeUrl = urlParams.get("codeUrl")
   const urlPayType = urlParams.get("payType")
   const [qrCode, setQrCode] = useState<any>('暂未选择支付方式');
-  const [isDisabled, setIsDisabled] = useState<boolean>(false); // 只允许支付宝；使用该属性禁用微信支付
+  // const [isDisabled, setIsDisabled] = useState<boolean>(false); // 只允许支付宝；使用该属性禁用微信支付
   const params = useParams()
 
   /**
@@ -100,13 +101,7 @@ const PayOrder: React.FC = () => {
       setQrCode(res.data.codeUrl)
     }
   }
-  /**
-   * 因为只提供一种支付方式，这个页面的功能虽然需要，但是页面不需要展示，这里直接重定向到我的订单页；
-   * 然后用户再点击支付支付订单
-   */
-  useEffect(() => {
-    history.push('/order/list');
-  }, []);
+
   useEffect(() => {
     if (urlPayType) {
       setPayType(urlPayType)
@@ -116,13 +111,16 @@ const PayOrder: React.FC = () => {
 
   /**
    * 页面加载，选择字符类型(这里默认只提供支付宝)
+   *因为只提供一种支付方式，这个页面的功能虽然需要，但是页面不需要展示，
+   * 这里直接重定向到我的订单页；然后用户再点击支付支付订单
    */
   useEffect(() => {
     if (payType === "ALIPAY") {
-      toAlipay().then(r => console.log(r));
+      toAlipay();
+      history.push('/order/list');
     }
     if (payType === "WX" && !codeUrl) {
-      createOrder().then(r => console.log(r));
+      createOrder();
     }
   }, [payType])
 
@@ -181,116 +179,116 @@ const PayOrder: React.FC = () => {
     }
     createOrder()
   }, [])
-  return (
-    <>
-      <Card style={{minWidth: 385}}>
-        <Spin spinning={loading}>
-          <Card title={<strong>商品信息</strong>}>
-            <div style={{marginLeft: 10}}>
-              <h3>{order?.productInfo?.name}</h3>
-              {/*<h4>{valueLength(order?.productInfo?.description) ? order?.productInfo?.description : "暂无商品描述信息"}</h4>*/}
-            </div>
-          </Card>
-          <br/>
-          <ProCard
-            bordered
-            headerBordered
-            layout={"center"}
-            title={<strong>支付方式</strong>}
-          >
-            <Radio.Group name="payType" value={payType}>
-              <ProCard wrap gutter={18}>
-                <ProCard
-                  onClick={() => {
-                    if (!isDisabled) { // `isDisabled` 是一个状态来控制是否禁用
-                      changePayType("WX");
-                    }
-                  }}
-                  hoverable
-                  style={{
-                    border: payType === "WX" ? '1px solid #1890ff' : '1px solid rgba(128, 128, 128, 0.5)',
-                    maxWidth: 260,
-                    minWidth: 210,
-                    margin: 10,
-                    cursor: isDisabled ? 'not-allowed' : 'pointer', // 显示不同的鼠标光标
-                    opacity: isDisabled ? 0.5 : 1, // 调整透明度来表示禁用状态
-                  }}
-                  colSpan={
-                    {
-                      xs: 24,
-                      sm: 12,
-                      md: 12,
-                      lg: 12,
-                      xl: 12
-                    }
-                  }>
-                  <Radio value={"WX"} style={{fontSize: "1.12rem"}}>
-                    <WxPay/> 微信支付
-                  </Radio>
-                </ProCard>
-                <ProCard
-                  onClick={() => {
-                    changePayType("ALIPAY")
-                  }}
-                  hoverable
-                  style={{
-                    margin: 10,
-                    maxWidth: 260,
-                    minWidth: 210,
-                    border: payType === "ALIPAY" ? '1px solid #1890ff' : '1px solid rgba(128, 128, 128, 0.5)',
-                  }}
-                  colSpan={
-                    {
-                      xs: 24,
-                      sm: 12,
-                      md: 12,
-                      lg: 12,
-                      xl: 12
-                    }
-                  }
-                >
-                  <Radio value={"ALIPAY"} style={{fontSize: "1.2rem"}}>
-                    <Alipay/> 支付宝
-                  </Radio>
-                </ProCard>
-              </ProCard>
-            </Radio.Group>
-          </ProCard>
-          <br/>
-          <Card title={"支付二维码"}>
-            <br/>
-            <ProCard
-              style={{marginTop: -30}}
-              layout={"center"}>
-              <QRCode
-                errorLevel="H"
-                size={240}
-                value={qrCode}
-                // @ts-ignore
-                status={status}
-                onRefresh={() => {
-                  if (!payType) {
-                    message.error("请先选择支付方式")
-                    return
-                  }
-                  createOrder()
-                }}
-              />
-            </ProCard>
-            <ProCard style={{
-              marginTop: -30,
-              color: "#f55f4e",
-              fontSize: 22,
-              display: 'flex',
-              fontWeight: "bold",
-            }} layout={"center"}>
-              ￥{total}
-            </ProCard>
-          </Card>
-        </Spin>
-      </Card>
-    </>
-  )
+  // return (
+    // <>
+    //   <Card style={{minWidth: 385}}>
+    //     <Spin spinning={loading}>
+    //       <Card title={<strong>商品信息</strong>}>
+    //         <div style={{marginLeft: 10}}>
+    //           <h3>{order?.productInfo?.name}</h3>
+    //           {/*<h4>{valueLength(order?.productInfo?.description) ? order?.productInfo?.description : "暂无商品描述信息"}</h4>*/}
+    //         </div>
+    //       </Card>
+    //       <br/>
+    //       <ProCard
+    //         bordered
+    //         headerBordered
+    //         layout={"center"}
+    //         title={<strong>支付方式</strong>}
+    //       >
+    //         <Radio.Group name="payType" value={payType}>
+    //           <ProCard wrap gutter={18}>
+    //             <ProCard
+    //               onClick={() => {
+    //                 if (!isDisabled) { // `isDisabled` 是一个状态来控制是否禁用
+    //                   changePayType("WX");
+    //                 }
+    //               }}
+    //               hoverable
+    //               style={{
+    //                 border: payType === "WX" ? '1px solid #1890ff' : '1px solid rgba(128, 128, 128, 0.5)',
+    //                 maxWidth: 260,
+    //                 minWidth: 210,
+    //                 margin: 10,
+    //                 cursor: isDisabled ? 'not-allowed' : 'pointer', // 显示不同的鼠标光标
+    //                 opacity: isDisabled ? 0.5 : 1, // 调整透明度来表示禁用状态
+    //               }}
+    //               colSpan={
+    //                 {
+    //                   xs: 24,
+    //                   sm: 12,
+    //                   md: 12,
+    //                   lg: 12,
+    //                   xl: 12
+    //                 }
+    //               }>
+    //               <Radio value={"WX"} style={{fontSize: "1.12rem"}}>
+    //                 <WxPay/> 微信支付
+    //               </Radio>
+    //             </ProCard>
+    //             <ProCard
+    //               onClick={() => {
+    //                 changePayType("ALIPAY")
+    //               }}
+    //               hoverable
+    //               style={{
+    //                 margin: 10,
+    //                 maxWidth: 260,
+    //                 minWidth: 210,
+    //                 border: payType === "ALIPAY" ? '1px solid #1890ff' : '1px solid rgba(128, 128, 128, 0.5)',
+    //               }}
+    //               colSpan={
+    //                 {
+    //                   xs: 24,
+    //                   sm: 12,
+    //                   md: 12,
+    //                   lg: 12,
+    //                   xl: 12
+    //                 }
+    //               }
+    //             >
+    //               <Radio value={"ALIPAY"} style={{fontSize: "1.2rem"}}>
+    //                 <Alipay/> 支付宝
+    //               </Radio>
+    //             </ProCard>
+    //           </ProCard>
+    //         </Radio.Group>
+    //       </ProCard>
+    //       <br/>
+    //       <Card title={"支付二维码"}>
+    //         <br/>
+    //         <ProCard
+    //           style={{marginTop: -30}}
+    //           layout={"center"}>
+    //           <QRCode
+    //             errorLevel="H"
+    //             size={240}
+    //             value={qrCode}
+    //             // @ts-ignore
+    //             status={status}
+    //             onRefresh={() => {
+    //               if (!payType) {
+    //                 message.error("请先选择支付方式")
+    //                 return
+    //               }
+    //               createOrder()
+    //             }}
+    //           />
+    //         </ProCard>
+    //         <ProCard style={{
+    //           marginTop: -30,
+    //           color: "#f55f4e",
+    //           fontSize: 22,
+    //           display: 'flex',
+    //           fontWeight: "bold",
+    //         }} layout={"center"}>
+    //           ￥{total}
+    //         </ProCard>
+    //       </Card>
+    //     </Spin>
+    //   </Card>
+    // </>
+  // )
 }
 
 export default PayOrder;

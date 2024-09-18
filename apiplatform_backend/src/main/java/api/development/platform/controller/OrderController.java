@@ -33,9 +33,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -159,19 +156,19 @@ public class OrderController {
         // 处理订单信息
         List<ProductOrderVo> productOrders = productOrderPage.getRecords().stream().map(this::formatProductOrderVo).collect(Collectors.toList());
         // 处理过期订单
-        LocalDateTime now = LocalDateTime.now();
-        for (ProductOrderVo productOrderVo: productOrders){
-            Date expirationTime = productOrderVo.getExpirationTime();
-            if (expirationTime != null) {
-                // 转换 Date 到 LocalDateTime
-                LocalDateTime expirationDateTime = LocalDateTime.ofInstant(
-                        expirationTime.toInstant(), ZoneId.systemDefault());
-                // 检查过期时间是否在当前时间之前
-                if (expirationDateTime.isBefore(now)) {
-                    closedProductOrder(productOrderVo.getOrderNo());
-                }
-            }
-        }
+//        LocalDateTime now = LocalDateTime.now();
+//        for (ProductOrderVo productOrderVo: productOrders){
+//            Date expirationTime = productOrderVo.getExpirationTime();
+//            if (expirationTime != null) {
+//                // 转换 Date 到 LocalDateTime
+//                LocalDateTime expirationDateTime = LocalDateTime.ofInstant(
+//                        expirationTime.toInstant(), ZoneId.systemDefault());
+//                // 检查过期时间是否在当前时间之前
+//                if (expirationDateTime.isBefore(now)) {
+//                    closedProductOrder(productOrderVo.getOrderNo());
+//                }
+//            }
+//        }
         orderVo.setRecords(productOrders);
         return ResultUtils.success(orderVo);
     }

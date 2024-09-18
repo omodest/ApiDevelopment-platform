@@ -105,10 +105,7 @@ wx:
 # todo 需替换配置  这里的密钥不能提交的git上，推送会失败
 cos:
   client:
-    accessKey: 1
-    secretKey: 1
-    region: 1
-    bucket: 1
+
 # 沙箱支付
 alipay:
 
@@ -129,6 +126,12 @@ name:  # 用户签名
   client:
     access-key: poise.admin
     secret-key: admin.admin
+# SDK 配置，如需使用自己的网关host需修改
+sdk:
+  api:
+    client:
+      # 本地测试网关地址
+      host: http://localhost:8111/api
 dubbo:
   application:
     name: dubbo-springboot-demo-provider

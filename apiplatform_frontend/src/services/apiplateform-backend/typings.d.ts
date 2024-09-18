@@ -1,10 +1,4 @@
 declare namespace API {
-  type BaseResponse = {
-    code?: number;
-    data?: Record<string, any>;
-    message?: string;
-  };
-
   type BaseResponseBoolean_ = {
     code?: number;
     data?: boolean;
@@ -71,18 +65,6 @@ declare namespace API {
     message?: string;
   };
 
-  type BaseResponsePagePost_ = {
-    code?: number;
-    data?: PagePost_;
-    message?: string;
-  };
-
-  type BaseResponsePagePostVO_ = {
-    code?: number;
-    data?: PagePostVO_;
-    message?: string;
-  };
-
   type BaseResponsePageProductInfo_ = {
     code?: number;
     data?: PageProductInfo_;
@@ -104,12 +86,6 @@ declare namespace API {
   type BaseResponsePageUserVO_ = {
     code?: number;
     data?: PageUserVO_;
-    message?: string;
-  };
-
-  type BaseResponsePostVO_ = {
-    code?: number;
-    data?: PostVO;
     message?: string;
   };
 
@@ -168,17 +144,17 @@ declare namespace API {
     id?: number;
   };
 
+  type Field = {
+    fieldName?: string;
+    value?: string;
+  };
+
   type getCaptchaUsingGETParams = {
     /** emailAccount */
     emailAccount?: string;
   };
 
   type getInterfaceInfoVOByIdUsingGETParams = {
-    /** id */
-    id?: number;
-  };
-
-  type getPostVOByIdUsingGETParams = {
     /** id */
     id?: number;
   };
@@ -235,7 +211,7 @@ declare namespace API {
 
   type InterfaceInfoInvokeRequest = {
     id?: number;
-    requestParams?: string;
+    requestParams?: Field[];
   };
 
   type InterfaceInfoQueryRequest = {
@@ -275,6 +251,7 @@ declare namespace API {
     interfaceType?: string;
     interfaceUrl?: string;
     is_deleted?: number;
+    requestExample?: string;
     requestHeader?: string;
     requestParams?: string;
     responceHeader?: string;
@@ -399,32 +376,6 @@ declare namespace API {
     total?: number;
   };
 
-  type PagePost_ = {
-    countId?: string;
-    current?: number;
-    maxLimit?: number;
-    optimizeCountSql?: boolean;
-    orders?: OrderItem[];
-    pages?: number;
-    records?: Post[];
-    searchCount?: boolean;
-    size?: number;
-    total?: number;
-  };
-
-  type PagePostVO_ = {
-    countId?: string;
-    current?: number;
-    maxLimit?: number;
-    optimizeCountSql?: boolean;
-    orders?: OrderItem[];
-    pages?: number;
-    records?: PostVO[];
-    searchCount?: boolean;
-    size?: number;
-    total?: number;
-  };
-
   type PageProductInfo_ = {
     countId?: string;
     current?: number;
@@ -480,87 +431,6 @@ declare namespace API {
   type PayCreateRequest = {
     payType?: string;
     productId?: string;
-  };
-
-  type Post = {
-    content?: string;
-    createTime?: string;
-    favourNum?: number;
-    id?: number;
-    isDelete?: number;
-    tags?: string;
-    thumbNum?: number;
-    title?: string;
-    updateTime?: string;
-    userId?: number;
-  };
-
-  type PostAddRequest = {
-    content?: string;
-    tags?: string[];
-    title?: string;
-  };
-
-  type PostEditRequest = {
-    content?: string;
-    id?: number;
-    tags?: string[];
-    title?: string;
-  };
-
-  type PostFavourAddRequest = {
-    postId?: number;
-  };
-
-  type PostFavourQueryRequest = {
-    current?: number;
-    pageSize?: number;
-    postQueryRequest?: PostQueryRequest;
-    sortField?: string;
-    sortOrder?: string;
-    userId?: number;
-  };
-
-  type PostQueryRequest = {
-    content?: string;
-    current?: number;
-    favourUserId?: number;
-    id?: number;
-    notId?: number;
-    orTags?: string[];
-    pageSize?: number;
-    searchText?: string;
-    sortField?: string;
-    sortOrder?: string;
-    tags?: string[];
-    title?: string;
-    userId?: number;
-  };
-
-  type PostThumbAddRequest = {
-    postId?: number;
-  };
-
-  type PostUpdateRequest = {
-    content?: string;
-    id?: number;
-    tags?: string[];
-    title?: string;
-  };
-
-  type PostVO = {
-    content?: string;
-    createTime?: string;
-    favourNum?: number;
-    hasFavour?: boolean;
-    hasThumb?: boolean;
-    id?: number;
-    tagList?: string[];
-    thumbNum?: number;
-    title?: string;
-    updateTime?: string;
-    user?: UserVO;
-    userId?: number;
   };
 
   type ProductInfo = {

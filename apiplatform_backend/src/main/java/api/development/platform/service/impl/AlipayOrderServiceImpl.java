@@ -32,6 +32,7 @@ import com.alipay.api.domain.AlipayTradeQueryModel;
 import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.api.request.AlipayTradeCloseRequest;
 import com.alipay.api.request.AlipayTradePagePayRequest;
+import com.alipay.api.request.AlipayTradeQueryRequest;
 import com.alipay.api.response.AlipayTradePagePayResponse;
 import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -66,19 +67,33 @@ import static api.development.platform.model.enums.PaymentStatusEnum.*;
 @Slf4j
 @Qualifier("ALIPAY")
 public class AlipayOrderServiceImpl extends ServiceImpl<ProductOrderMapper, ProductOrder> implements ProductOrderService {
+    /**
+     * 邮箱配置
+     */
     @Resource
     private EmailConfig emailConfig;
+    /**
+     * 邮箱发送接口
+     */
     @Resource
     private JavaMailSender mailSender;
+    /**
+     * 支付宝支付配置
+     */
     @Resource
     private AliPayAccountConfig aliPayAccountConfig;
     @Resource
     private UserService userService;
     @Resource
     private ProductInfoServiceImpl productInfoService;
-
+    /**
+     * todo 后续待优化 支付信息
+     */
     @Resource
     private PaymentInfoService paymentInfoService;
+    /**
+     * 分布式锁工具类
+     */
     @Resource
     private RedissonLockUtils redissonLockUtil;
 
@@ -91,14 +106,14 @@ public class AlipayOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Prod
      */
     @Override
     public ProductOrderVo getProductOrder(Long productId, UserVO loginUser, String payType) {
-        // mybatis plus 条件构造器
+        // mybatis plus 条件构造器，查询未支付的订单
         LambdaQueryWrapper<ProductOrder> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(ProductOrder::getProductId, productId);
         lambdaQueryWrapper.eq(ProductOrder::getStatus, NOTPAY.getValue());
         lambdaQueryWrapper.eq(ProductOrder::getPayType, payType);
         lambdaQueryWrapper.eq(ProductOrder::getUserId, loginUser.getId());
         ProductOrder oldOrder = this.getOne(lambdaQueryWrapper);
-        // 没有这个订单，返回null 表示该订单需要创建
+        // 没有未支付的订单这里返回null，表示该订单需要被创建
         if (oldOrder == null) {
             return null;
         }
@@ -116,7 +131,7 @@ public class AlipayOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Prod
      * @param loginUser 登录用户
      */
     @Override
-    public ProductOrderVo saveProductOrder(Long productId, UserVO loginUser) throws AlipayApiException {
+    public ProductOrderVo saveProductOrder(Long productId, UserVO loginUser) {
         // 获取产品信息
         ProductInfo productInfo = productInfoService.getById(productId);
         if (productInfo == null) {
@@ -139,7 +154,6 @@ public class AlipayOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Prod
         productOrder.setExpirationTime(expirationTime);
         productOrder.setProductInfo(JSONUtil.toJsonPrettyStr(productInfo));
         productOrder.setAddPoints(productInfo.getAddPoints());
-
         boolean saveResult = this.save(productOrder);
 
         // 拿到付款链接，以及各种关于支付宝的各种信息
@@ -148,32 +162,31 @@ public class AlipayOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Prod
         AlipayClient alipayClient = new
             DefaultAlipayClient(aliPayAccountConfig.getGatewayUrl(), aliPayAccountConfig.getAppId(), aliPayAccountConfig.getAppPrivateKey(),
         "json", aliPayAccountConfig.getCharset(), aliPayAccountConfig.getAliPayPublicKey(), aliPayAccountConfig.getSignType());
-
         // 设置支付请求参数，model 为订单的详细信息
         AlipayTradePagePayModel model = new AlipayTradePagePayModel();
-        model.setOutTradeNo(orderNo);
-        model.setSubject(productInfo.getName());
-        model.setProductCode("FAST_INSTANT_TRADE_PAY");
+        model.setOutTradeNo(orderNo); // 订单号
+        model.setSubject(productInfo.getName());  // 商品名称
+        model.setProductCode("FAST_INSTANT_TRADE_PAY");  // 商品名称
         // 金额四舍五入
         BigDecimal scaledAmount = new BigDecimal(productInfo.getTotal()).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
         model.setTotalAmount(String.valueOf(scaledAmount));
         model.setBody(productInfo.getDescription());
-        // 设置请求参数
+        //  创建支付请求对象并设置请求参数
         AlipayTradePagePayRequest request = new AlipayTradePagePayRequest();
-        request.setBizModel(model);
-        request.setNotifyUrl(aliPayAccountConfig.getNotifyUrl());
-        request.setReturnUrl(aliPayAccountConfig.getReturnUrl());
+        request.setBizModel(model); // 设置业务模型
+        request.setNotifyUrl(aliPayAccountConfig.getNotifyUrl()); // 设置异步通知地
+        request.setReturnUrl(aliPayAccountConfig.getReturnUrl()); // 设置同步通知地址
         try {
-            // 这一步是调用支付宝沙箱接口
+            // 这一步是调用支付宝沙箱接口，生成支付链接，并获取响应
             AlipayTradePagePayResponse alipayTradePagePayResponse = alipayClient.pageExecute(request);
             // 拿到付款二维码地址
             String payUrl = alipayTradePagePayResponse.getBody();
+            // 将支付链接保存到订单对象中
             productOrder.setFormData(payUrl);
         } catch (AlipayApiException e) {
             throw new RuntimeException(e);
         }
-
-        // 将付款链接
+        // 修改订单数据
         boolean updateResult = this.updateProductOrder(productOrder);
         if (!updateResult || !saveResult) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR);
@@ -187,7 +200,7 @@ public class AlipayOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Prod
     }
 
     /**
-     * 创建订单时执行  更新订单的formData
+     * 创建订单时执行  更新订单的 formData(支付宝支付链接)
      * @param productOrder 产品订单
      */
     @Override
@@ -224,10 +237,13 @@ public class AlipayOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Prod
      */
     @Override
     public void closedOrderByOrderNo(String outTradeNo) throws AlipayApiException {
+        // 创建关闭交易请求，设置要关闭的订单号
         AlipayTradeCloseModel alipayTradeCloseModel = new AlipayTradeCloseModel();
         alipayTradeCloseModel.setOutTradeNo(outTradeNo);
+        // 创建一个请求对象，设置必要的参数
         AlipayTradeCloseRequest request = new AlipayTradeCloseRequest();
         request.setBizModel(alipayTradeCloseModel);
+        // 行请求并发送到支付宝 API
         AliPayApi.doExecute(request);
     }
 
@@ -254,52 +270,71 @@ public class AlipayOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Prod
     public void processingTimedOutOrders(ProductOrder productOrder) {
         String orderNo = productOrder.getOrderNo();
         try {
-            // 查询订单
-            AlipayTradeQueryModel alipayTradeQueryModel = new AlipayTradeQueryModel();
-            alipayTradeQueryModel.setOutTradeNo(orderNo);
-            AlipayTradeQueryResponse alipayTradeQueryResponse = AliPayApi.tradeQueryToResponse(alipayTradeQueryModel);
+            // 初始化 AlipayClient
+            AlipayClient alipayClient = new DefaultAlipayClient(
+                    aliPayAccountConfig.getGatewayUrl(),
+                    aliPayAccountConfig.getAppId(),
+                    aliPayAccountConfig.getAppPrivateKey(),
+                    "json",
+                    aliPayAccountConfig.getCharset(),
+                    aliPayAccountConfig.getAliPayPublicKey(),
+                    aliPayAccountConfig.getSignType()
+            );
 
-            // 本地创建了订单,但是用户没有扫码,支付宝端没有订单
-            if (!alipayTradeQueryResponse.getCode().equals(RESPONSE_CODE_SUCCESS)) {
+            // 创建查询请求
+            AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
+            AlipayTradeQueryModel model = new AlipayTradeQueryModel();
+            model.setOutTradeNo(orderNo);
+            request.setBizModel(model);
+
+            // 发送请求并获取响应
+            AlipayTradeQueryResponse response = alipayClient.execute(request);
+
+            // 检查响应码
+            if (!response.isSuccess() || !RESPONSE_CODE_SUCCESS.equals(response.getCode())) {
                 // 更新本地订单状态
                 this.updateOrderStatusByOrderNo(orderNo, CLOSED.getValue());
                 log.info("超时订单{},更新成功", orderNo);
                 return;
             }
-            String tradeStatus = AlipayTradeStatusEnum.findByName(alipayTradeQueryResponse.getTradeStatus()).getPaymentStatusEnum().getValue();
-            // 订单没有支付就关闭订单,更新本地订单状态
+
+            // 处理交易状态
+            String tradeStatus = AlipayTradeStatusEnum.findByName(response.getTradeStatus()).getPaymentStatusEnum().getValue();
             if (tradeStatus.equals(NOTPAY.getValue()) || tradeStatus.equals(CLOSED.getValue())) {
                 closedOrderByOrderNo(orderNo);
                 this.updateOrderStatusByOrderNo(orderNo, CLOSED.getValue());
                 log.info("超时订单{},关闭成功", orderNo);
                 return;
             }
+
             if (tradeStatus.equals(SUCCESS.getValue())) {
-                // 订单已支付更新商户端的订单状态
+                // 订单已支付，更新商户端的订单状态
                 boolean updateOrderStatus = this.updateOrderStatusByOrderNo(orderNo, SUCCESS.getValue());
                 // 补发积分到用户钱包
                 boolean addWalletBalance = userService.addWalletBalance(productOrder.getUserId(), Math.toIntExact(productOrder.getAddPoints()));
                 // 保存支付记录
                 PaymentInfoVo paymentInfoVo = new PaymentInfoVo();
                 paymentInfoVo.setAppid(aliPayAccountConfig.getAppId());
-                paymentInfoVo.setOutTradeNo(alipayTradeQueryResponse.getOutTradeNo());
-                paymentInfoVo.setTransactionId(alipayTradeQueryResponse.getTradeNo());
+                paymentInfoVo.setOutTradeNo(response.getOutTradeNo());
+                paymentInfoVo.setTransactionId(response.getTradeNo());
                 paymentInfoVo.setTradeType("电脑网站支付");
-                paymentInfoVo.setTradeState(alipayTradeQueryResponse.getTradeStatus());
+                paymentInfoVo.setTradeState(response.getTradeStatus());
                 paymentInfoVo.setTradeStateDesc("支付成功");
-                paymentInfoVo.setSuccessTime(String.valueOf(alipayTradeQueryResponse.getSendPayDate()));
+                paymentInfoVo.setSuccessTime(String.valueOf(response.getSendPayDate()));
                 boolean paymentResult = paymentInfoService.createPaymentInfo(paymentInfoVo);
-                if (!updateOrderStatus & !addWalletBalance & !paymentResult) {
+
+                // 检查操作结果
+                if (!updateOrderStatus || !addWalletBalance || !paymentResult) {
                     throw new BusinessException(ErrorCode.OPERATION_ERROR);
                 }
-                sendSuccessEmail(productOrder, alipayTradeQueryResponse.getTotalAmount());
+
+                sendSuccessEmail(productOrder, response.getTotalAmount());
                 log.info("超时订单{},更新成功", orderNo);
             }
         } catch (AlipayApiException e) {
-            log.error("订单{} 处理失败", orderNo);
+            log.error("订单{} 处理失败", orderNo, e);
             throw new BusinessException(ErrorCode.OPERATION_ERROR, e.getMessage());
         }
-
     }
 
     /**
@@ -312,6 +347,7 @@ public class AlipayOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Prod
         User user = userService.getById(productOrder.getUserId());
         if (StringUtils.isNotBlank(user.getQq())) {
             try {
+                // 拿到订单
                 ProductOrder productOrderByOutTradeNo = this.getProductOrderByOutTradeNo(productOrder.getOrderNo());
                 new EmailUtils().sendPaySuccessEmail(user.getQq(), mailSender, emailConfig, productOrderByOutTradeNo.getOrderName(),
                         String.valueOf(orderTotal));
@@ -323,22 +359,35 @@ public class AlipayOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Prod
     }
 
 
+    /**
+     * 支付宝的异步通知回调
+     * @param notifyData 通知数据
+     * @param request    要求
+     * @return 提示结果
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public String doPaymentNotify(String notifyData, HttpServletRequest request) {
+        // 将请求参数转换成 Map 格式
         Map<String, String> params = AliPayApi.toMap(request);
+        // 将参数转换成 AliPayAsyncResponse 对象
         AliPayAsyncResponse aliPayAsyncResponse = JSONUtil.toBean(JSONUtil.toJsonStr(params), AliPayAsyncResponse.class);
+        // 创建一个分布式锁的名字，用于保证同一时间只有一个线程处理该订单
         String lockName = "notify:AlipayOrder:lock:" + aliPayAsyncResponse.getOutTradeNo();
+        // 使用分布式锁进行操作，防止重复处理
         return redissonLockUtil.redissonDistributedLocks(lockName, "【支付宝异步回调异常】:", () -> {
             String result;
             try {
+                // 校验支付宝订单
                 result = checkAlipayOrder(aliPayAsyncResponse, params);
             } catch (AlipayApiException e) {
                 throw new BusinessException(ErrorCode.OPERATION_ERROR, e.getMessage());
             }
+            // 支付宝订单检验异常，直接返回
             if (!"success".equals(result)) {
                 return result;
             }
+            // 执行支付后，处理订单数据
             String doAliPayOrderBusinessResult = this.doAliPayOrderBusiness(aliPayAsyncResponse);
             if (StringUtils.isBlank(doAliPayOrderBusinessResult)) {
                 throw new BusinessException(ErrorCode.OPERATION_ERROR);
@@ -347,6 +396,11 @@ public class AlipayOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Prod
         });
     }
 
+    /**
+     * 订单检查
+     * @param response AliPayAsyncResponse 对象
+     * @param params 请求参数 Map
+     */
     private String checkAlipayOrder(AliPayAsyncResponse response, Map<String, String> params) throws AlipayApiException {
         String result = "failure";
         boolean verifyResult = AlipaySignature.rsaCheckV1(params, AliPayApiConfigKit.getAliPayApiConfig().getAliPayPublicKey(),
@@ -367,21 +421,28 @@ public class AlipayOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Prod
             log.error("订单金额不一致");
             return result;
         }
-        // 4.验证 app_id 是否为该商家本身。
+        // 3. 验证 app_id 是否为该商家本身。
         String appId = aliPayAccountConfig.getAppId();
         if (!response.getAppId().equals(appId)) {
             log.error("校验失败");
             return result;
         }
-        // 状态 TRADE_SUCCESS 的通知触发条件是商家开通的产品支持退款功能的前提下，买家付款成功。
+        // 4. 状态 TRADE_SUCCESS 的通知触发条件是商家开通的产品支持退款功能的前提下，买家付款成功。
         String tradeStatus = response.getTradeStatus();
         if (!tradeStatus.equals(TRADE_SUCCESS)) {
             log.error("交易失败");
             return result;
         }
+        // todo 执行 这里是不是能完成前端支付后的请求？
+        // todo 这里怎么不进断点
+
         return "success";
     }
 
+    /**
+     * 支付业务
+     * @param response AliPayAsyncResponse 对象
+     */
     @SneakyThrows
     protected String doAliPayOrderBusiness(AliPayAsyncResponse response) {
         String outTradeNo = response.getOutTradeNo();

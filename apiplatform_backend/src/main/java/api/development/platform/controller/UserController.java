@@ -26,11 +26,13 @@ import org.springframework.messaging.MessagingException;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.mail.internet.MimeMessage;
 import javax.annotation.Resource;
+import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -52,11 +54,8 @@ public class UserController {
     @Resource
     private UserService userService;
 
-//    @Resource
-//    private WxOpenConfig wxOpenConfig;
-
     /**
-     * 引入操作数据库的依赖
+     * 引入操作redis数据库的依赖
      */
     @Resource
     private RedisTemplate<String, String> redisTemplate;
@@ -78,11 +77,12 @@ public class UserController {
     /**
      * 用户注册
      *
-     * @param userRegisterRequest
-     * @return
+     * @param userRegisterRequest 注册请求
+     * @return 用户id
      */
     @PostMapping("/register")
     public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
+        // 参数校验
         if (userRegisterRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -92,6 +92,7 @@ public class UserController {
         if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
             return null;
         }
+        // 注册
         long result = userService.userRegister(userAccount, userPassword, checkPassword);
         return ResultUtils.success(result);
     }
@@ -104,6 +105,7 @@ public class UserController {
         if (userEmailRegisterRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
+        // 邮箱注册逻辑
         long result = userService.userEmailRegister(userEmailRegisterRequest);
         // 因为短信验证码会存储到redis数据库，所以这里手动删除下
         redisTemplate.delete(CAPTCHA_CACHE_KEY + userEmailRegisterRequest.getEmailAccount());
@@ -118,6 +120,7 @@ public class UserController {
      */
     @GetMapping("/getCaptcha")
     public BaseResponse<Boolean> getCaptcha(String emailAccount) {
+        // 参数校验
         if (StringUtils.isBlank(emailAccount)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -125,9 +128,11 @@ public class UserController {
         if (!Pattern.matches(emailPattern, emailAccount)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "不合法的邮箱地址！");
         }
+        // 生成6位验证码
         String captcha = RandomUtil.randomNumbers(6);
         try {
             sendEmail(emailAccount, captcha);
+            // 验证码存储到redis；方便将用户输入的验证码与redis中存储的验证码比较
             redisTemplate.opsForValue().set(CAPTCHA_CACHE_KEY + emailAccount, captcha, 5, TimeUnit.MINUTES);
             return ResultUtils.success(true);
         } catch (Exception e) {
@@ -136,15 +141,24 @@ public class UserController {
         }
     }
 
+    /**
+     * 发送邮箱验证码
+     * @param emailAccount 收件人邮箱
+     * @param captcha 验证码
+     */
     private void sendEmail(String emailAccount, String captcha) throws MessagingException, javax.mail.MessagingException {
+        // 创建一个邮件API
         MimeMessage message = mailSender.createMimeMessage();
         // 邮箱发送内容组成
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        // 设置邮件主题
         helper.setSubject(EMAIL_SUBJECT);
+        // 使用工具类构建文件内容
         String emailContent = buildEmailContent(EMAIL_HTML_CONTENT_PATH, captcha);
-        System.out.println("Email Content: " + emailContent); // 打印邮件内容以进行调试
         helper.setText(emailContent, true);
+        // 接收者邮箱地址
         helper.setTo(emailAccount);
+        // 邮件的发件人地址
         helper.setFrom(EMAIL_TITLE + '<' + emailConfig.getEmailFrom() + '>');
         mailSender.send(message);
     }
@@ -171,35 +185,9 @@ public class UserController {
     }
 
     /**
-     * 用户登录（微信开放平台）
-     * todo
-     */
-//    @GetMapping("/login/wx_open")
-//    public BaseResponse<LoginUserVO> userLoginByWxOpen(HttpServletRequest request, HttpServletResponse response,
-//            @RequestParam("code") String code // 从请求参数中获取名为"name"的参数值，并将其绑定到控制器方法的name参数上
-//    ) {
-//        WxOAuth2AccessToken accessToken;
-//        try {
-//            WxMpService wxService = wxOpenConfig.getWxMpService();
-//            accessToken = wxService.getOAuth2Service().getAccessToken(code);
-//            WxOAuth2UserInfo userInfo = wxService.getOAuth2Service().getUserInfo(accessToken, code);
-//            String unionId = userInfo.getUnionId();
-//            String mpOpenId = userInfo.getOpenid();
-//            if (StringUtils.isAnyBlank(unionId, mpOpenId)) {
-//                throw new BusinessException(ErrorCode.SYSTEM_ERROR, "登录失败，系统错误");
-//            }
-//            return ResultUtils.success(userService.userLoginByMpOpen(userInfo, request));
-//        } catch (Exception e) {
-//            log.error("userLoginByWxOpen error", e);
-//            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "登录失败，系统错误");
-//        }
-//    }
-
-    /**
      * 用户注销
-     *
-     * @param request
-     * @return
+     * @param request 客户端请求
+     * @return 操作结果
      */
     @PostMapping("/logout")
     public BaseResponse<Boolean> userLogout(HttpServletRequest request) {
@@ -212,9 +200,8 @@ public class UserController {
 
     /**
      * 获取当前登录用户
-     *
-     * @param request
-     * @return
+     * @param request 客户端请求
+     * @return 操作结果
      */
     @GetMapping("/get/login")
     public BaseResponse<LoginUserVO> getLoginUser(HttpServletRequest request) {
@@ -228,14 +215,10 @@ public class UserController {
 
     /**
      * 创建用户
-     *
-     * @param userAddRequest
-     * @param request
-     * @return
      */
     @PostMapping("/add")
-    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE) // 自定义权限注解
-    public BaseResponse<Long> addUser(@RequestBody UserAddRequest userAddRequest, HttpServletRequest request) {
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE) // 自定义权限注解(管理员)
+    public BaseResponse<Long> addUser(@RequestBody UserAddRequest userAddRequest) {
         if (userAddRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -252,14 +235,10 @@ public class UserController {
 
     /**
      * 删除用户
-     *
-     * @param deleteRequest
-     * @param request
-     * @return
      */
     @PostMapping("/delete")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
-    public BaseResponse<Boolean> deleteUser(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
+    public BaseResponse<Boolean> deleteUser(@RequestBody DeleteRequest deleteRequest) {
         if (deleteRequest == null || deleteRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -268,26 +247,29 @@ public class UserController {
     }
 
     /**
-     * 更新用户
-     *
-     * @param userUpdateRequest
-     * @param request
-     * @return
+     * 更新用户(管理员)
+     * 当前项目不提供管理员修改用户功能
      */
     @PostMapping("/update")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
-    public BaseResponse<Boolean> updateUser(@RequestBody UserUpdateRequest userUpdateRequest,
-            HttpServletRequest request) {
+    public BaseResponse<Boolean> updateUser(@RequestBody UserUpdateRequest userUpdateRequest) {
         if (userUpdateRequest == null || userUpdateRequest.getId() == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        User loginUser = userService.getLoginUser(request);
-        User user = new User();
-        BeanUtils.copyProperties(userUpdateRequest, user);
-        // remark 因为这里使用的是copyProperties，所以一些没有赋值的字段可能为空，这里可能出现数据修改错误的小bug
-        user.setId(loginUser.getId());
-        user.setKunCoin(loginUser.getKunCoin());
-        user.setAge(loginUser.getAge());
+        // 修改请求参数
+        Long id = userUpdateRequest.getId();
+        User user = userService.getById(id);
+        user.setSex(userUpdateRequest.getSex());
+        user.setAge(userUpdateRequest.getAge());
+        user.setTelephone(userUpdateRequest.getTelephone());
+        user.setUserName(userUpdateRequest.getUserName());
+        user.setUserAvatar(userUpdateRequest.getUserAvatar());
+        user.setUserProfile(userUpdateRequest.getUserProfile());
+        user.setUserRole(userUpdateRequest.getUserRole());
+        //
+        LocalDate localDate = LocalDateTime.now().toLocalDate();
+        Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        user.setUpdateTime(date);
         boolean result = userService.updateById(user);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(true);
@@ -295,10 +277,6 @@ public class UserController {
 
     /**
      * 根据 id 获取用户（仅管理员）
-     *
-     * @param id
-     * @param request
-     * @return
      */
     @GetMapping("/get")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
@@ -313,10 +291,6 @@ public class UserController {
 
     /**
      * 根据 id 获取包装类
-     *
-     * @param id
-     * @param request
-     * @return
      */
     @GetMapping("/get/vo")
     public BaseResponse<UserVO> getUserVOById(long id, HttpServletRequest request) {
@@ -327,10 +301,6 @@ public class UserController {
 
     /**
      * 分页获取用户列表（仅管理员）
-     *
-     * @param userQueryRequest
-     * @param request
-     * @return
      */
     @PostMapping("/list/page")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
@@ -345,10 +315,9 @@ public class UserController {
 
     /**
      * 分页获取用户封装列表
-     *
-     * @param userQueryRequest
-     * @param request
-     * @return
+     * @param userQueryRequest 查询请求
+     * @param request 客户端请求
+     * @return 分页vo
      */
     @PostMapping("/list/page/vo")
     public BaseResponse<Page<UserVO>> listUserVOByPage(@RequestBody UserQueryRequest userQueryRequest,
@@ -372,10 +341,6 @@ public class UserController {
 
     /**
      * 更新个人信息
-     *
-     * @param userUpdateMyRequest
-     * @param request
-     * @return
      */
     @PostMapping("/update/my")
     public BaseResponse<Boolean> updateMyUser(@RequestBody UserUpdateMyRequest userUpdateMyRequest,
@@ -383,18 +348,27 @@ public class UserController {
         if (userUpdateMyRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        User loginUser = userService.getLoginUser(request);
-        User user = new User();
-        BeanUtils.copyProperties(userUpdateMyRequest, user);
-        // remark 因为这里使用的是copyProperties，所以一些没有赋值的字段可能为空，这里可能出现数据修改错误的小bug
-        user.setId(loginUser.getId());
-        user.setKunCoin(loginUser.getKunCoin());
-        user.setAge(loginUser.getAge());
+        // 修改请求参数
+        User user = userService.getLoginUser(request);
+        user.setSex(userUpdateMyRequest.getSex());
+        user.setAge(userUpdateMyRequest.getAge());
+        user.setTelephone(userUpdateMyRequest.getTelephone());
+        user.setUserName(userUpdateMyRequest.getUserName());
+        user.setUserAvatar(userUpdateMyRequest.getUserAvatar());
+        user.setUserProfile(userUpdateMyRequest.getUserProfile());
+        LocalDate localDate = LocalDateTime.now().toLocalDate();
+        Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        user.setUpdateTime(date);
         boolean result = userService.updateById(user);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(true);
     }
 
+    /**
+     * 更新用户签名密钥
+     * @param httpServletRequest 用来获取用户信息
+     * @return 操作结果
+     */
     @GetMapping("/updata/askey")
     public BaseResponse<Boolean> updateASKey(HttpServletRequest httpServletRequest){
         User loginUser = userService.getLoginUser(httpServletRequest);
@@ -403,14 +377,24 @@ public class UserController {
 
     }
 
+    /**
+     * 签到操作
+     * @param httpServletRequest 用来获取用户信息
+     * @return 操作结果
+     */
     @PostMapping("/doSign")
     public BaseResponse<Boolean> doSign(HttpServletRequest httpServletRequest){
         boolean done = userService.doCurrentDaySign(httpServletRequest);
         return ResultUtils.success(done);
     }
 
+    /**
+     * 统计签到次数
+     * @param httpServletRequest 用来获取用户信息
+     * @return 操作结果
+     */
     @GetMapping("/get/totalSign")
-    public BaseResponse getSignNum(HttpServletRequest httpServletRequest){
+    public BaseResponse<Integer> getSignNum(HttpServletRequest httpServletRequest){
         Integer constantSignDay = userService.getConstantSignDay(httpServletRequest);
         return ResultUtils.success(constantSignDay);
     }

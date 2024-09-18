@@ -5,19 +5,19 @@
 <mapper namespace="api.development.platform.mapper.InterfaceInfoMapper">
 
     <resultMap id="BaseResultMap" type="api.development.apiplatform_interface.model.entity.InterfaceInfo">
-            <id property="id" column="id" jdbcType="BIGINT"/>
-            <result property="interfaceName" column="interfaceName" jdbcType="VARCHAR"/>
-            <result property="interfaceDescript" column="interfaceDescript" jdbcType="VARCHAR"/>
-            <result property="interfaceUrl" column="interfaceUrl" jdbcType="VARCHAR"/>
-            <result property="requestHeader" column="requestHeader" jdbcType="VARCHAR"/>
-            <result property="requestParams" column="requestParams" jdbcType="VARCHAR"/>
-            <result property="responceHeader" column="responceHeader" jdbcType="VARCHAR"/>
-            <result property="interfaceType" column="interfaceType" jdbcType="VARCHAR"/>
-            <result property="interfaceStatus" column="interfaceStatus" jdbcType="TINYINT"/>
-            <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
-            <result property="update_time" column="update_time" jdbcType="TIMESTAMP"/>
-            <result property="is_deleted" column="is_deleted" jdbcType="TINYINT"/>
-            <result property="userId" column="userId" jdbcType="BIGINT"/>
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="interfaceName" column="interfaceName" jdbcType="VARCHAR"/>
+        <result property="interfaceDescript" column="interfaceDescript" jdbcType="VARCHAR"/>
+        <result property="interfaceUrl" column="interfaceUrl" jdbcType="VARCHAR"/>
+        <result property="requestHeader" column="requestHeader" jdbcType="VARCHAR"/>
+        <result property="requestParams" column="requestParams" jdbcType="VARCHAR"/>
+        <result property="responceHeader" column="responceHeader" jdbcType="VARCHAR"/>
+        <result property="interfaceType" column="interfaceType" jdbcType="VARCHAR"/>
+        <result property="interfaceStatus" column="interfaceStatus" jdbcType="TINYINT"/>
+        <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+        <result property="update_time" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="is_deleted" column="is_deleted" jdbcType="TINYINT"/>
+        <result property="userId" column="userId" jdbcType="BIGINT"/>
     </resultMap>
 
     <sql id="Base_Column_List">
