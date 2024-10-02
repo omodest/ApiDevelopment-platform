@@ -191,9 +191,6 @@ public class InterfaceInfoController {
     @PostMapping("/invoke")
     @Transactional(rollbackFor = Exception.class)
     public BaseResponse<Object> invokeInterfaceInfo(@RequestBody InterfaceInfoInvokeRequest interfaceInfoInvokeRequest, HttpServletRequest httpServletRequest){
-        // 这里设置断点
-        System.out.println("Received request: " + interfaceInfoInvokeRequest);
-
         // 1. 参数校验
         Long id = interfaceInfoInvokeRequest.getId();
         if (ObjectUtils.isEmpty(interfaceInfoInvokeRequest.getRequestParams()) || id <= 0){
@@ -210,6 +207,8 @@ public class InterfaceInfoController {
         }
         // 查询调用接口的用户,校验用户是否有调用次数是否大于0
         User loginUser = userService.getLoginUser(httpServletRequest);
+        int kunCoin = loginUser.getKunCoin();
+
         String accessKey = loginUser.getAccessKey();
         String secretKey = loginUser.getSecretKey();
         Long loginUserId = loginUser.getId();
@@ -218,17 +217,29 @@ public class InterfaceInfoController {
         userInterfaceInfoQueryWrapper.eq("userId",loginUserId);
         UserInterfaceInfo userInterfaceInfo = userInterfaceInfoMapper.selectOne(userInterfaceInfoQueryWrapper);
         if (userInterfaceInfo.getLeftNum() <= 0){
-            throw new BusinessException(ErrorCode.OPERATION_ERROR,"用户剩余调用次数不足");
-        }
+            if (kunCoin <= 0){
+                throw new BusinessException(ErrorCode.OPERATION_ERROR,"用户剩余调用次数不足");
+            }
+            try {
+                kunCoin--;
+                loginUser.setKunCoin(kunCoin);
+                userService.updateById(loginUser);
+            } catch (Exception e) {
+                // 处理保存失败的情况
+                throw new BusinessException(ErrorCode.OPERATION_ERROR,"钱不够");
+            }
 
+        }
         // 2. 构建查询参数
         Gson gson = new Gson();
         List<InterfaceInfoInvokeRequest.Field> fieldList = interfaceInfoInvokeRequest.getRequestParams();
         String requestParams = "{}";
         if (fieldList != null && fieldList.size() > 0) {
             JsonObject jsonObject = new JsonObject();
-            for (InterfaceInfoInvokeRequest.Field field : fieldList) {
-                jsonObject.addProperty(field.getFieldName(), field.getValue());
+            for (InterfaceInfoInvokeRequest.Field field : fieldList) { //
+                if (StringUtils.isNotBlank(field.getFieldName())){
+                    jsonObject.addProperty(field.getFieldName(), field.getValue());
+                }
             }
             requestParams = gson.toJson(jsonObject);
         }

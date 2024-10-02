@@ -450,7 +450,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public boolean addWalletBalance(Long userId, Integer addPoints) {
         LambdaUpdateWrapper<User> userLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
         userLambdaUpdateWrapper.eq(User::getId, userId);
-        userLambdaUpdateWrapper.setSql("balance = balance + " + addPoints);
+        userLambdaUpdateWrapper.setSql("kunCoin = kunCoin + " + addPoints);
         return this.update(userLambdaUpdateWrapper);
     }
 }

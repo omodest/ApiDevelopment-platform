@@ -399,15 +399,17 @@ const Login: React.FC = () => {
                 {isUpdating ? '正在更新...' : '点我更换签名和密钥'}
               </Button>
             </div>
+            <form action="https://github.com/omodest/ApiDevelopment-platform" method="get">
+              <button type="submit">下载SDK</button>
+            </form>
+
+
+
             <div>
-              点我下载SDK
-              {/*todo 换成github地址*/}
+              accessKey: {editedData.accessKey}
             </div>
             <div>
-              {editedData.accessKey}
-            </div>
-            <div>
-              {editedData.secretKey}
+              secretKey: {editedData.secretKey}
             </div>
           </Card>
 

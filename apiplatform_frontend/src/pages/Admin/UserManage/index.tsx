@@ -156,18 +156,18 @@ const TableList: React.FC = () => {
       title: '操作',
       valueType: 'option',
       render: (_, record) => [
-        <a
-          key={`update-${record.id}`}
-          onClick={() => {
-            if (!isDisabled) {
-              handleUpdateModalVisible(true);
-              setCurrentRow(record);
-            }
-          }}
-          style={{ pointerEvents: isDisabled ? 'none' : 'auto', color: isDisabled ? 'grey' : 'blue' }}
-        >
-          修改
-        </a>,
+        // <a
+        //   key={`update-${record.id}`}
+        //   onClick={() => {
+        //     if (!isDisabled) {
+        //       handleUpdateModalVisible(true);
+        //       setCurrentRow(record);
+        //     }
+        //   }}
+        //   style={{ pointerEvents: isDisabled ? 'none' : 'auto', color: isDisabled ? 'grey' : 'blue' }}
+        // >
+        //   修改
+        // </a>,
         <Button
           type="text"
           key={`delete-${record.id}`}
@@ -240,11 +240,9 @@ const TableList: React.FC = () => {
         dataSource={dataSource}
         columns={tableColumns}
         request={listUserVoByPageUsingPost}
-        rowSelection={{
-          onChange: (_, selectedRows) => {
-            setSelectedRows(selectedRows);
-          },
-        }}
+        rowSelection={false} // 不使用选择框
+        toolBarRender={() => []} // 隐藏新增按钮
+        search={false} // 设置为 false 以隐藏查询框
       />
       {selectedRowsState?.length > 0 && (
         <FooterToolbar

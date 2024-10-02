@@ -273,14 +273,13 @@ public class OrderController {
 
 
     /**
-     * 解析订单通知结果（因为最终结果是将一个html 存到订单表的formData，所以需要对这一坨东西进行解析）
+     * 解析订单通知结果，支付成功后的回调信息，修改用户钱包和修改订单状态等。。。。。
      * 通知频率为15s/15s/30s/3m/10m/20m/30m/30m/30m/60m/3h/3h/3h/6h/6h - 总计 24h4m
      *
      * @param notifyData 通知数据
      * @param request    请求
      * @return {@link String}
      */
-
     @PostMapping("/notify/order")
     public String parseOrderNotifyResult(@RequestBody String notifyData, HttpServletRequest request) {
         return orderService.doOrderNotify(notifyData, request);

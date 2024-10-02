@@ -341,11 +341,8 @@ const TableList: React.FC = () => {
         ]}
         request={listInterfaceInfoByPageUsingGet}
         columns={columns}
-        rowSelection={{
-          onChange: (_, selectedRows) => {
-            setSelectedRows(selectedRows);
-          },
-        }}
+        rowSelection={false}
+        toolBarRender={() => []} // 隐藏新增按钮
       />
       {selectedRowsState?.length > 0 && (
         <FooterToolbar
