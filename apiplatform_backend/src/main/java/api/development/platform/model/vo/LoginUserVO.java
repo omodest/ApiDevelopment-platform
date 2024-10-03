@@ -10,6 +10,8 @@ import lombok.Data;
 @Data
 public class LoginUserVO implements Serializable {
 
+
+
     /**
      * 用户 id
      */

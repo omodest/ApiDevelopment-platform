@@ -3,9 +3,11 @@ package api.development.apiplatform_gateway;
 import api.development.apiplatform_client_sdk.utils.SignUtils;
 import api.development.apiplatform_interface.model.entity.InterfaceInfo;
 import api.development.apiplatform_interface.model.entity.User;
+import api.development.apiplatform_interface.model.entity.UserInterfaceInfo;
 import api.development.apiplatform_interface.service.InnerInterfaceInfoService;
 import api.development.apiplatform_interface.service.InnerUserInterfaceInfoService;
 import api.development.apiplatform_interface.service.InnerUserService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.reactivestreams.Publisher;
@@ -127,7 +129,6 @@ public class CustomGlobalFilter  implements
         if (interfaceInfo == null) {
             return handleNoAuth(response);
         }
-
         return handleResponse(exchange, chain, interfaceInfo.getId(), invokeUser.getId());
     }
 

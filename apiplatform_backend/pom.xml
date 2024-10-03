@@ -212,6 +212,14 @@
             <groupId>com.sun.mail</groupId>
             <artifactId>jakarta.mail</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>3.18.2</version> <!-- 使用最新版本 -->
+        </dependency>
+
+
     </dependencies>
 
     <build>
@@ -226,6 +234,14 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>11</source>
+                    <target>11</target>
                 </configuration>
             </plugin>
         </plugins>

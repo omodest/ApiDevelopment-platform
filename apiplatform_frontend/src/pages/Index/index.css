@@ -1,0 +1,26 @@
+.interface-list-container {
+  padding: 20px;
+  background: #f7f9fc;
+  border-radius: 8px;
+  border: 1px solid #e6e6e6;
+}
+
+.interface-card {
+  border: 1px solid #e6e6e6;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.interface-card:hover {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transform: translateY(-3px);
+}
+
+.ant-pagination {
+  margin-top: 20px;
+}
+
+.ant-input-search {
+  border-radius: 4px;
+  width: 100%;
+}

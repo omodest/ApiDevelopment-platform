@@ -195,6 +195,7 @@ declare namespace API {
     requestHeader?: string;
     requestParams?: string;
     responceHeader?: string;
+    totalInvokes?: number;
     update_time?: string;
     userId?: number;
   };
@@ -255,6 +256,7 @@ declare namespace API {
     requestHeader?: string;
     requestParams?: string;
     responceHeader?: string;
+    totalInvoke?: number;
     totalNum?: number;
     update_time?: string;
     userId?: number;

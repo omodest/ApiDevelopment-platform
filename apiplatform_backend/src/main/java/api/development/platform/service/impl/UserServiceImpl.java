@@ -29,6 +29,7 @@ import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -134,14 +135,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         queryWrapper.eq("userAccount", userAccount);
         queryWrapper.eq("userPassword", encryptPassword);
         User user = this.baseMapper.selectOne(queryWrapper);
+        LoginUserVO userVo = getLoginUserVO(user);
         // 用户不存在
         if (user == null) {
             log.info("user login failed, userAccount cannot match userPassword");
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在或密码错误");
         }
+
         // 3. 记录用户的登录态
         request.getSession().setAttribute(USER_LOGIN_STATE, user);
-        return this.getLoginUserVO(user);
+        return userVo;
     }
 
     @Override

@@ -4,11 +4,8 @@ import { Button, Card, Descriptions, Form, message, Input, Divider } from 'antd'
 import { useParams } from '@@/exports';
 import { getInterfaceInfoVoByIdUsingGet } from "@/services/apiform_backend/interfaceInfoController";
 import { invokeInterfaceInfoUsingPost } from "../../services/apiplateform-backend/interfaceInfoController";
+import SwaggerUIComponent from '@/components/InterfaceSwagger/SwaggerUI'; // 导入 Swagger 组件
 
-/**
- * 主页
- * @constructor
- */
 const Index: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<API.InterfaceInfo | null>(null);
@@ -109,6 +106,7 @@ const Index: React.FC = () => {
       <Card title="返回结果" loading={invokeLoading}>
         <pre>{invokeRes || '无返回结果'}</pre>
       </Card>
+      <Divider />
     </PageContainer>
   );
 };

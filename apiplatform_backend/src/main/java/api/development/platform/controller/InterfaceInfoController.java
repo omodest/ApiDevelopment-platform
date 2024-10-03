@@ -21,6 +21,7 @@ import api.development.platform.model.dto.InterfaceInfo.InterfaceInfoQueryReques
 import api.development.platform.model.dto.InterfaceInfo.InterfaceInfoUpdateRequest;
 import api.development.platform.model.enums.InterfaceStatusEnum;
 import api.development.platform.service.InterfaceInfoService;
+import api.development.platform.service.UserInterfaceInfoService;
 import api.development.platform.service.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -66,6 +67,9 @@ public class InterfaceInfoController {
      */
     @Resource
     private NameClient nameClient;
+
+    @Resource
+    private UserInterfaceInfoService userInterfaceInfoService;
 
     // region 增删改查
 
@@ -207,7 +211,6 @@ public class InterfaceInfoController {
         }
         // 查询调用接口的用户,校验用户是否有调用次数是否大于0
         User loginUser = userService.getLoginUser(httpServletRequest);
-        int kunCoin = loginUser.getKunCoin();
 
         String accessKey = loginUser.getAccessKey();
         String secretKey = loginUser.getSecretKey();
@@ -216,20 +219,7 @@ public class InterfaceInfoController {
         userInterfaceInfoQueryWrapper.eq("interfaceInfoId", id);
         userInterfaceInfoQueryWrapper.eq("userId",loginUserId);
         UserInterfaceInfo userInterfaceInfo = userInterfaceInfoMapper.selectOne(userInterfaceInfoQueryWrapper);
-        if (userInterfaceInfo.getLeftNum() <= 0){
-            if (kunCoin <= 0){
-                throw new BusinessException(ErrorCode.OPERATION_ERROR,"用户剩余调用次数不足");
-            }
-            try {
-                kunCoin--;
-                loginUser.setKunCoin(kunCoin);
-                userService.updateById(loginUser);
-            } catch (Exception e) {
-                // 处理保存失败的情况
-                throw new BusinessException(ErrorCode.OPERATION_ERROR,"钱不够");
-            }
-
-        }
+        userInterfaceInfoService.validUserInterfaceInfo(userInterfaceInfo, false);
         // 2. 构建查询参数
         Gson gson = new Gson();
         List<InterfaceInfoInvokeRequest.Field> fieldList = interfaceInfoInvokeRequest.getRequestParams();
@@ -254,6 +244,10 @@ public class InterfaceInfoController {
             currencyRequest.setPath(oldInterfaceInfo.getInterfaceUrl());
             currencyRequest.setRequestParams(params);
             ResultResponse response = apiServices.request(qiApiClient, currencyRequest);
+
+            userInterfaceInfo.setLeftNum(0);
+            userInterfaceInfoMapper.updateById(userInterfaceInfo);
+
             return ResultUtils.success(response.getData());
         } catch (JsonSyntaxException e) {
             // 处理 JSON 解析异常
@@ -319,7 +313,9 @@ public class InterfaceInfoController {
         }
         QueryWrapper<InterfaceInfo> queryWrapper = new QueryWrapper<>(interfaceInfoQuery);
         List<InterfaceInfo> interfaceInfoList = interfaceInfoService.list(queryWrapper);
-        return ResultUtils.success(interfaceInfoList);
+        // 添加调用总数
+        List<InterfaceInfo> interfaceInfos = interfaceInfoService.InterfaceAddTotalInvoke(interfaceInfoList);
+        return ResultUtils.success(interfaceInfos);
 
     }
 
@@ -351,6 +347,11 @@ public class InterfaceInfoController {
         // 获取分页查询结果
         Page<InterfaceInfo> interfaceInfoPage = interfaceInfoService.page(new Page<>(current, size),
                 queryWrapper);
-        return ResultUtils.success(interfaceInfoPage);
+        // 创建 PageRequest 对象并设置 pageSize 为总条数
+        PageRequest pageRequest = new PageRequest();
+        pageRequest.setPageSize((int) interfaceInfoPage.getTotal()); // 设置为总条数
+        // 添加调用总数
+        Page<InterfaceInfo> interfaceInfos = interfaceInfoService.PageInterfaceAddTotalInvoke(interfaceInfoPage,pageRequest.getCurrent(),pageRequest.getPageSize());
+        return ResultUtils.success(interfaceInfos);
     }
 }

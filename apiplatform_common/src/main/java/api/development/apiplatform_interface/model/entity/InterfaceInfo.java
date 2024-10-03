@@ -13,6 +13,13 @@ import java.util.Date;
 @TableName(value ="interface_info")
 @Data
 public class InterfaceInfo implements Serializable {
+
+    private String avatarUrl;
+
+    /**
+     * 调用总次数
+     */
+    private int totalInvokes;
     /**
      * 主键
      */
